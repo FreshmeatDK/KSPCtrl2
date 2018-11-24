@@ -82,7 +82,6 @@ void trimmers()
 
 void toggles()
 {
-	
 	bool change = false;
 	SPI.beginTransaction(SPISettings(6000000, MSBFIRST, SPI_MODE2));
 
@@ -96,33 +95,148 @@ void toggles()
 		digitalWrite(CLKI, HIGH);
 
 	}
+
 	digitalWrite(SS1, LOW);
 	SPI.endTransaction();
-
 	SPI.beginTransaction(SPISettings(3000000, MSBFIRST, SPI_MODE2));
-
-
 	digitalWrite(SS2, LOW);
 	delay(1);
+
 	for (int i = NUMIC1; i < NUMIC1 + NUMIC2; i++)
 	{
 		dataIn[i] = shiftIn(DTA, CLK, MSBFIRST);
 	}
+
 	digitalWrite(SS2, HIGH);
 	SPI.endTransaction();
-
-	AGandCtlUpdate();
-	StatusToggles();
-
 }
 
-void AGandCtlUpdate()
+void CtlUpdate()
 {
 	byte sasMap[10] = { 9,2,5,7,9,6,4,2,1,10 };
 	byte sasVal;
+	bool statusRead;
 
+	//set control toggles that does not have LED attached
 	sasVal = 15 - (dataIn[1] & B00001111);
-	setSASMode(sasMap[sasVal]);
+	if ((getSASMode() != sasMap[sasVal]) && (millis()-SASgrace > 200 ))
+	{
+		if (!snia)
+		{
+			setSASMode(SMSAS);
+			snia = true;
+		}
+		else
+		{
+			setSASMode(sasMap[sasVal]);
+			snia = false;
+			SASgrace = millis();
+		}
+	}
+	
 	MainControls(STAGE, (dataIn[4] & B00000100));
-	MainControls(SAS, (dataIn[1] & B01000000));
+	MainControls(ABORT, (dataIn[0] & B00010000));
+
+	/*Picks out the relevant toggle of the dataIn bytes and change LED accordingly*/
+
+	//AG 1
+	statusRead = (dataIn[1] & B00010000);
+	statusLED(19, statusRead);
+	ControlGroups(1, statusRead);
+
+	//AG 2
+	statusRead = (dataIn[1] & B00100000);
+	statusLED(18, statusRead);
+	ControlGroups(2, statusRead);
+
+	//AG 3
+	statusRead = (dataIn[2] & B00010000);
+	statusLED(17, statusRead);
+	ControlGroups(3, statusRead);
+
+	//AG 4
+	statusRead = (dataIn[2] & B00100000);
+	statusLED(16, statusRead);
+	ControlGroups(4, statusRead);
+
+	//AG 5
+	statusRead = (dataIn[2] & B01000000);
+	statusLED(15, statusRead);
+	ControlGroups(5, statusRead);
+
+	//AG 6
+	statusRead = (dataIn[2] & B10000000);
+	statusLED(14, statusRead);
+	ControlGroups(6, statusRead);
+
+	//AG 7
+	statusRead = (dataIn[2] & B00000001);
+	statusLED(13, statusRead);
+	ControlGroups(7, statusRead);
+
+	//AG 8
+	statusRead = (dataIn[2] & B00000010);
+	statusLED(12, statusRead);
+	ControlGroups(8, statusRead);
+
+	//AG 9
+	statusRead = (dataIn[2] & B00000100);
+	statusLED(11, statusRead);
+	ControlGroups(9, statusRead);
+
+	//AG 10
+	statusRead = (dataIn[2] & B00001000);
+	statusLED(10, statusRead);
+	ControlGroups(10, statusRead);
+
+	//SAS
+	statusRead = (dataIn[1] & B01000000);
+	statusLED(0, statusRead);
+	MainControls(SAS, statusRead);
+
+	//RCS
+	statusRead = (dataIn[1] & B10000000);
+	statusLED(1, statusRead);
+	MainControls(RCS, statusRead);
+
+	//Gear
+	statusRead = (dataIn[3] & B10000000);
+	statusLED(2, statusRead);
+	MainControls(GEAR, statusRead);
+
+	//Brakes
+	statusRead = ((dataIn[3] & B01000000) || (dataIn[4] & B00000010));
+	statusLED(3, statusRead);
+	MainControls(BRAKES, statusRead);
+	
+
+	//Engine mode
+	statusRead = (dataIn[3] & B00100000);
+	statusLED(4, statusRead);
+
+	//Lights
+	statusRead = (dataIn[3] & B00010000);
+	statusLED(5, statusRead);
+	MainControls(LIGHTS, statusRead);
+
+	//Solar panels
+	statusRead = (dataIn[3] & B00001000);
+	statusLED(6, statusRead);
+
+	//Radiators
+	statusRead = (dataIn[3] & B00000100);
+	statusLED(7, statusRead);
+
+	//Cargo bays
+	statusRead = (dataIn[3] & B00000010);
+	statusLED(8, statusRead);
+
+	//Reserve batteries
+	statusRead = (dataIn[3] & B00000001);
+	statusLED(9, statusRead);
+
+
+	FastLED.show();
+
+
 }

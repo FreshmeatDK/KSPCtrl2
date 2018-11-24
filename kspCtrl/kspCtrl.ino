@@ -216,6 +216,7 @@ ControlPacket CPacket;
 
 unsigned long deadtime, deadtimeOld, controlTime, controlTimeOld, indicatorTime, indicatorTimeOld, mainTime, mainTimeOld;
 unsigned long now, nowIndic, nowMain;
+uint32_t SASgrace; //time until we check that SAS is not in agreement and enforce, needed to avoid ping-pong.
 
 byte second = 0, minute, hour = 0, dayOfWeek, dayOfMonth, month, year; // bytes to hold RT clock
 char key; // keypress buffer
@@ -225,6 +226,7 @@ int trimY, trimP, trimR, trimE;
 
 long timeout = 0; //timeout counter
 bool connected, displayoff; // are we connected and are we in blackout
+bool snia; //sas not in agreement
 
 char keys[5][8] = {
 	{ '7', '8', '9', '-', ',', '.', 'S', 'M' },

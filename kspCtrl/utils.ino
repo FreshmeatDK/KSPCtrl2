@@ -27,7 +27,6 @@ int nPotJy(int pot, int min, int deadmin, int deadmax, int max, int low, int hig
 	return retval;
 }
 
-
 int nPotSl(int pot, int min, int max, int dead, int low, int high)
 {
 	int retval = 0;
@@ -112,94 +111,6 @@ void printAllBytes()
 	}
 	Serial.println();
 
-}
-
-void StatusToggles()
-{
-	/*Picks out the relevant toggle of the dataIn bytes and change LED accordingly*/
-	bool statusRead;
-	//AG 1
-	statusRead = (dataIn[1] & B00010000);
-	statusLED(19, statusRead);
-
-	//AG 2
-	statusRead = (dataIn[1] & B00100000);
-	statusLED(18, statusRead);
-
-	//AG 3
-	statusRead = (dataIn[2] & B00010000);
-	statusLED(17, statusRead);
-
-	//AG 4
-	statusRead = (dataIn[2] & B00100000);
-	statusLED(16, statusRead);
-
-	//AG 5
-	statusRead = (dataIn[2] & B01000000);
-	statusLED(15, statusRead);
-
-	//AG 6
-	statusRead = (dataIn[2] & B10000000);
-	statusLED(14, statusRead);
-
-	//AG 7
-	statusRead = (dataIn[2] & B00000001);
-	statusLED(13, statusRead);
-
-	//AG 8
-	statusRead = (dataIn[2] & B00000010);
-	statusLED(12, statusRead);
-
-	//AG 9
-	statusRead = (dataIn[2] & B00000100);
-	statusLED(11, statusRead);
-
-	//AG 10
-	statusRead = (dataIn[2] & B00001000);
-	statusLED(10, statusRead);
-
-	//SAS
-	statusRead = (dataIn[1] & B01000000);
-	statusLED(0, statusRead);
-
-	//RCS
-	statusRead = (dataIn[1] & B10000000);
-	statusLED(1, statusRead);
-
-	//Gear
-	statusRead = (dataIn[3] & B10000000);
-	statusLED(2, statusRead);
-
-	//Brakes
-	statusRead = (dataIn[3] & B01000000);
-	statusLED(3, statusRead);
-
-	//Engine mode
-	statusRead = (dataIn[3] & B00100000);
-	statusLED(4, statusRead);
-
-	//Lights
-	statusRead = (dataIn[3] & B00010000);
-	statusLED(5, statusRead);
-
-	//Solar panels
-	statusRead = (dataIn[3] & B00001000);
-	statusLED(6, statusRead);
-
-	//Radiators
-	statusRead = (dataIn[3] & B00000100);
-	statusLED(7, statusRead);
-
-	//Cargo bays
-	statusRead = (dataIn[3] & B00000010);
-	statusLED(8, statusRead);
-
-	//Reserve batteries
-	statusRead = (dataIn[3] & B00000001);
-	statusLED(9, statusRead);
-
-
-	FastLED.show();
 }
 
 void rotSelectors()

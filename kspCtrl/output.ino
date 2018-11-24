@@ -5,7 +5,7 @@ void output() {
   
   controlTime = now - controlTimeOld; 
   if (controlTime > CONTROLREFRESH){
-
+	  controlTimeOld = now;
 	  controls();
   } 
  }
@@ -15,8 +15,8 @@ void controls() {
   if (Connected) {
 
 	joysticks();
-
 	toggles();
+	CtlUpdate();
 
     KSPBoardSendData(details(CPacket));
 

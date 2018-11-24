@@ -263,12 +263,14 @@ void testSerial()
 	lcd2.print(VData.TPe);
 }
 
-void testTimeDisplay()
+void testMiscDisplay()
 {
 	char pstr[8];
 	lcd2.clear();
 	//lcd2.print(VData.TAp);
+	lcd2.setCursor(0, 0);
+	lcd2.print(dataIn[4],BIN);
 	lcd2.setCursor(0, 1);
-	time2str(VData.TAp, pstr);
-	lcd2.print(pstr);
+	lcd2.print(dataIn[3], BIN);
+	
 }
