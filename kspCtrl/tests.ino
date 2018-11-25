@@ -266,11 +266,27 @@ void testSerial()
 void testMiscDisplay()
 {
 	char pstr[8];
+	int select;
+	select = (dataIn[0] & B00000111);
 	lcd2.clear();
 	//lcd2.print(VData.TAp);
 	lcd2.setCursor(0, 0);
-	lcd2.print(dataIn[4],BIN);
+	lcd2.print(select);
 	lcd2.setCursor(0, 1);
 	lcd2.print(dataIn[3], BIN);
 	
+}
+
+void gaugeCalibration()
+{
+	int var;
+
+	var = analogRead(THROTTLE) / 4;
+
+	LCNum(1, var);
+	analogWrite(CHARGE, var);
+	analogWrite(MONO, var);
+	analogWrite(ALT, var);
+	analogWrite(SPEED, var);
+
 }

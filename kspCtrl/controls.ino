@@ -11,8 +11,17 @@ void joysticks()
 	CPacket.Pitch = constrain(j1y + trimP, -1000, 1000);
 
 	j1z = nPotJy(analogRead(JOY1Z), 3, 500, 550, 1023, -1000, 1000);
-	CPacket.Roll = constrain(j1z + trimR, -1000, 1000);
 
+	if ((dataIn[0] & B00000111) == 3)
+	{
+		CPacket.Roll = CPacket.Yaw;
+		CPacket.Yaw = constrain(j1z + trimR, -1000, 1000);
+	}
+	else
+	{
+		CPacket.Roll = constrain(j1z + trimR, -1000, 1000);
+	}
+	
 	j2x = nPotJy(analogRead(JOY2X), 3, 525, 535, 1023, -1000, 1000);
 	CPacket.TX = constrain((j2x * trimE)/100, -1000, 1000);
 
@@ -113,7 +122,7 @@ void toggles()
 
 void CtlUpdate()
 {
-	byte sasMap[10] = { 9,2,5,7,9,6,4,2,1,10 };
+	byte sasMap[10] = { 9,3,5,7,9,6,4,2,1,10 };
 	byte sasVal;
 	bool statusRead;
 

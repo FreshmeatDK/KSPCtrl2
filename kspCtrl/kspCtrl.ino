@@ -310,5 +310,5 @@ void loop()
 {
 	input();
 	output();
-
+	
 }
