@@ -238,6 +238,7 @@ char keys[5][8] = {
 byte rowPins[5] = { 35, 33, 31, 29, 37 };
 byte colPins[8] = { 26, 24, 22, 30, 28, 32, 34, 36 };
 
+byte slaveCtrl; //byte to send to slave Arduino to forward to kRPC
 
 // objects
 CRGB leds[NUMLEDS], oldLeds[NUMLEDS]; // Array of WS2811
@@ -252,6 +253,9 @@ Keypad keymain(makeKeymap(keys), rowPins, colPins, 5, 8);
 void setup()
 {
 	Serial.begin(38400);
+
+	Wire.begin();
+
 	// Meter init
 	pinMode(CHARGE, OUTPUT);
 	analogWrite(CHARGE, 0);

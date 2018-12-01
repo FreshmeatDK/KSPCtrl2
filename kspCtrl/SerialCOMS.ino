@@ -82,7 +82,12 @@ void KSPBoardSendData(uint8_t * address, uint8_t len){
   Serial.write(CS);
 }
 
-
+void SendToSlave(byte ctrlByte)
+{
+	Wire.beginTransmission(8);
+	Wire.write(ctrlByte);
+	Wire.endTransmission();
+}
 
 
 

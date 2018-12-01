@@ -19,7 +19,7 @@ void controls() {
 	CtlUpdate();
 
     KSPBoardSendData(details(CPacket));
-
+	SendToSlave(slaveCtrl);
   }
 }
 

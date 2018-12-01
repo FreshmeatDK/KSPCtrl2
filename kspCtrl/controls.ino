@@ -46,7 +46,7 @@ void trimmers()
 	trYaw = 50 * nPotJy(analogRead(TRIMYAW), 1004, 490, 454, 4, -20, 20);
 	trPitch = 50 * nPotJy(analogRead(TRIMPITCH), 1004, 490, 454, 4, -20, 20);
 	trRoll = 50 * nPotJy(analogRead(TRIMROLL), 1002, 545, 501, 2, -20, 20);
-	trEng = 5 * (nPotSl(analogRead(TRIMENGINE), 1002, 2, 15, 0, 20));
+	trEng = 5 * (nPotSl(analogRead(TRIMENGINE), 1002, 4, 20, 0, 20));
 
 	if ((trYaw < trYO) || (trYaw > trYO))
 	{
@@ -125,6 +125,14 @@ void CtlUpdate()
 	byte sasMap[10] = { 9,3,5,7,9,6,4,2,1,10 };
 	byte sasVal;
 	bool statusRead;
+	
+	//pack slaveCtrl to send to kRPC
+
+	slaveCtrl = (dataIn[0] & B11110000); //This holds camera nibble
+	sasVal = (dataIn[3] & B00001110); //we borrow this byte for placeholder to make things easier to follow
+	slaveCtrl = (slaveCtrl | sasVal); //sasval adds holds  solar, cargo and radiator
+	sasVal = (dataIn[3] & B00100000);
+	slaveCtrl = (slaveCtrl | (sasVal >> 5)); // add engine mode to last bit
 
 	//set control toggles that does not have LED attached
 	sasVal = 15 - (dataIn[1] & B00001111);
