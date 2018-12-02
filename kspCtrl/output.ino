@@ -17,6 +17,7 @@ void controls() {
 	joysticks();
 	toggles();
 	CtlUpdate();
+	chkKeypad();
 
     KSPBoardSendData(details(CPacket));
 	SendToSlave(slaveCtrl);

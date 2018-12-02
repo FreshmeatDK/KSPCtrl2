@@ -162,7 +162,7 @@ void chkKeypad() {
 		if ((key != '#')) {
 			cmdStr[cmdStrIndex] = key;
 			cmdStrIndex++;
-			Serial.println(key);
+			//Serial.println(key);
 		}
 
 		if (cmdStrIndex > 18) cmdStrIndex = 18;

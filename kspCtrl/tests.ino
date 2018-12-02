@@ -268,7 +268,7 @@ void testMiscDisplay()
 	char pstr[8];
 	int select;
 	select = (dataIn[0] & B00000111);
-	lcd2.clear();
+	//lcd2.clear();
 	//lcd2.print(VData.TAp);
 	lcd2.setCursor(0, 0);
 	lcd2.print(select);
