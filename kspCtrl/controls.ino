@@ -257,3 +257,55 @@ void CtlUpdate()
 
 
 }
+
+void chkKeypad() {
+
+	char *s; // result of search
+	char key = keymain.getKey();
+
+	if (key != NO_KEY) 
+	{
+		//Serial.println(key);
+		if ((key == '#')) {
+			cmdStr[cmdStrIndex - 1] = '\0';
+			cmdStrIndex--;
+			lcd2.setCursor(cmdStrIndex, 3);
+			lcd2.print(" ");
+
+		}
+		
+		s = strchr("0123456789*", key); // Internal control panel codes
+		if (s != NULL) 
+		{
+			cmdStr[cmdStrIndex] = key;
+			cmdStrIndex++;
+			
+		}
+		s = strchr(",.", key); //send to computer as keystrokes
+		if (s != NULL)
+		{
+			Keyboard.print(key);
+		
+		}
+
+		if (key == 'å')
+		{
+			Keyboard.write(135);
+		}
+
+
+
+		if (cmdStrIndex > 18) cmdStrIndex = 18;
+	}
+	lcd2.setCursor(0, 3);
+	lcd2.print(cmdStr);
+	if ((cmdStr[cmdStrIndex - 1] == '*') && (cmdStr[cmdStrIndex - 2] == '*')) {
+		execCmd();
+		lcd2.clear();
+		for (int i = 0; i <= 18; i++) {
+			cmdStr[i] = '\0';
+		}
+		cmdStrIndex = 0;
+	}
+
+}

@@ -148,37 +148,6 @@ void statusLED(int lednum, bool status)
 	else leds[lednum] = 0x110000;
 }
 
-void chkKeypad() {
-
-	char key = keymain.getKey();
-	if (key != NO_KEY) {
-		if ((key == '#')) {
-			cmdStr[cmdStrIndex - 1] = '\0';
-			cmdStrIndex--;
-			lcd2.setCursor(cmdStrIndex, 3);
-			lcd2.print(" ");
-
-		}
-		if ((key != '#')) {
-			cmdStr[cmdStrIndex] = key;
-			cmdStrIndex++;
-			//Serial.println(key);
-		}
-
-		if (cmdStrIndex > 18) cmdStrIndex = 18;
-
-	}
-	lcd2.setCursor(0, 3);
-	lcd2.print(cmdStr);
-	if ((cmdStr[cmdStrIndex - 1] == '*') && (cmdStr[cmdStrIndex - 2] == '*')) {
-		execCmd();
-		lcd2.clear();
-		for (int i = 0; i <= 18; i++) {
-			cmdStr[i] = '\0';
-		}
-		cmdStrIndex = 0;
-	}
-}
 
 void execCmd() {
 	char action[2];

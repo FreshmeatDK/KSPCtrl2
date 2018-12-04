@@ -1,4 +1,5 @@
 ﻿
+#include <Keyboard.h>
 #include <Keypad.h>
 #include <Wire.h>
 #include <math.h>
@@ -229,11 +230,11 @@ bool connected, displayoff; // are we connected and are we in blackout
 bool snia; //sas not in agreement
 
 char keys[5][8] = {
-	{ '7', '8', '9', '-', ',', '.', 'S', 'M' },
+	{ '7', '8', '9', '\'', '.', ',', 'S', 'M' },
 { '4', '5', '6', 'c', 'v', 'V', 'P', 'R' },
-{ '1', '2', '3', 91, 93, 'B', 'I', 'O' },
+{ '1', '2', '3', 'u' ,'i' , 'b', 'I', 'O' },
 { '0', '*', '#', 'm', 'T', 'B', 'N', 'A' },
-{ 'W', 's', 'x', 'q', 'v', 'r', 'g', 'G' }
+{ 'W', 's', 'x', 'å', ']', 'r', 'g', 'G' }
 };
 byte rowPins[5] = { 35, 33, 31, 29, 37 };
 byte colPins[8] = { 26, 24, 22, 30, 28, 32, 34, 36 };
@@ -253,8 +254,8 @@ Keypad keymain(makeKeymap(keys), rowPins, colPins, 5, 8);
 void setup()
 {
 	Serial.begin(38400);
-
 	Wire.begin();
+	Keyboard.begin();
 
 	// Meter init
 	pinMode(CHARGE, OUTPUT);
@@ -312,7 +313,7 @@ void setup()
 // Add the main program code into the continuous loop() function
 void loop()
 {
-	input();
-	output();
-	
+	//input();
+	//output();
+	testSuite();
 }
