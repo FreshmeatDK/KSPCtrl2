@@ -230,11 +230,11 @@ bool connected, displayoff; // are we connected and are we in blackout
 bool snia; //sas not in agreement
 
 char keys[5][8] = {
-	{ '7', '8', '9', '\'', '.', ',', 'S', 'M' },
+	{ '7', '8', '9', '-', '.', ',', 'S', 'M' },
 { '4', '5', '6', 'c', 'v', 'V', 'P', 'R' },
 { '1', '2', '3', 'u' ,'i' , 'b', 'I', 'O' },
 { '0', '*', '#', 'm', 'T', 'B', 'N', 'A' },
-{ 'W', 's', 'x', 'å', ']', 'r', 'g', 'G' }
+{ 'W', 's', 'x', '[', ']', 'r', 'g', 'G' }
 };
 byte rowPins[5] = { 35, 33, 31, 29, 37 };
 byte colPins[8] = { 26, 24, 22, 30, 28, 32, 34, 36 };

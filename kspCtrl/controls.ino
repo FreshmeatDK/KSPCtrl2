@@ -281,20 +281,57 @@ void chkKeypad() {
 			cmdStrIndex++;
 			
 		}
-		s = strchr(",.", key); //send to computer as keystrokes
+		s = strchr(",.-", key); //send to computer as keystrokes
 		if (s != NULL)
 		{
 			Keyboard.print(key);
 		
 		}
 
-		if (key == 'å')
+		if (key == 'M') // phys warp increase
 		{
-			Keyboard.write(135);
+			Keyboard.press(130);
+			Keyboard.press('.');
+			delay(1);
+			Keyboard.release('.');
+			Keyboard.release(130);
 		}
 
+		if (key == 'S') // phys warp decrease
+		{
+			Keyboard.press(130);
+			Keyboard.press(',');
+			delay(1);
+			Keyboard.release(',');
+			Keyboard.release(130);
+		}
+				
 
+		if (key == 'P') // reaction wheels on
+		{
+			slaveCtrl = (slaveCtrl | B00010000);
+		}
 
+		if (key == 'R') // reaction wheels off
+		{
+			slaveCtrl = (slaveCtrl & B11101111);
+		}
+
+		if (key == 'c') // navball: surface
+		{
+			setNavballMode(NAVBallSURFACE);
+		}
+
+		if (key == 'v') // navball: orbit
+		{
+			setNavballMode(NAVBallORBIT);
+		}
+
+		if (key == 'V') // navball: target
+		{
+			setNavballMode(NAVBallTARGET);
+		}
+				
 		if (cmdStrIndex > 18) cmdStrIndex = 18;
 	}
 	lcd2.setCursor(0, 3);
