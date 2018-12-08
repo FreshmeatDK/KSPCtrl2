@@ -251,7 +251,9 @@ void testLED()
 	for (int i = 0; i < NUMLEDS; i++)
 	{
 		singleLED(i);
-		delay(100);
+		LCNum(1, i);
+		delay(1000);
+	
 	}
 
 }

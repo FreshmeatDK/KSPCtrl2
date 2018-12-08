@@ -313,7 +313,7 @@ void setup()
 // Add the main program code into the continuous loop() function
 void loop()
 {
-	//input();
-	//output();
-	testSuite();
+	input();
+	output();
+	//testSuite();
 }

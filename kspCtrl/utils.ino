@@ -139,15 +139,80 @@ void singleLED(int lednum)
 		if (i != lednum) leds[i] = CRGB::Black;
 	}
 	leds[lednum] = CRGB::Green;
-
+	FastLED.show();
 }
 
 void statusLED(int lednum, bool status)
 {
-	if (status) leds[lednum] = 0x001100;
-	else leds[lednum] = 0x110000;
+	if (status) leds[lednum] = 0x001100; //green
+	else leds[lednum] = 0x110000; //red
 }
 
+byte warnLvl(byte qty, byte t1, byte t2, byte t3) 
+{
+	byte wlevel =0;
+	// compares the quantity qty against warning thresholds t1 -t3 and returns alarm level
+	// goes from low to high, remember to invert resource warnings
+
+	if ((qty >= t1) && (qty < t2)) wlevel = 1;
+	else if ((qty >= t2) && (qty < t3)) wlevel = 2;
+	else if (qty > t3) wlevel = 3;
+
+	return wlevel;
+}
+
+
+void warnLedSet(uint8_t lednum, uint8_t level)
+{
+	//colors led according to warnlevel
+	// use second%2 to create blink
+
+	if (level == 0)
+	{
+		leds[lednum] = 0x000000;
+	}
+
+	if (level == 1) 
+	{
+		leds[lednum] = 0x080800; //yellow
+	}
+
+	else if (level == 2)
+	{
+		leds[lednum] = 0x110000; //red
+	}
+
+	else if (level == 3)
+	{
+		if (second%2 == 0) leds[lednum] = 0x110000; //red blink
+		else leds[lednum] = 0x001100;
+	}
+	
+	else if (level == 4) //safe, no two bit value gets this level. Use for parachute
+		{
+			leds[lednum] = 0x001100; // green
+		}
+
+}
+
+byte reqAccPct(float a) {   //returns the required percentage of acceleration
+							//to stop at target. 
+	uint16_t aReqPct;
+
+
+	if (getNavballMode() == 3) { // navball mode target
+		if (VData.TargetDist < 3000) {
+			aReqPct = (uint16_t)50 * VData.TargetV*VData.TargetV / (VData.TargetDist*a);
+			if (aReqPct > 255) aReqPct = 255;
+		}
+
+	}
+	else if ((getNavballMode() == 2) && ((dataIn[3] & B0000111)== B100) && (VData.VVI < 0) && (VData.RAlt < 3000)) { // rocket in surface mode going down
+		aReqPct = (uint16_t)50 * VData.VVI*VData.VVI / (VData.RAlt * 3 * a);
+		if (aReqPct > 255) aReqPct = 255;
+	}
+
+}
 
 void execCmd() {
 	char action[2];
@@ -577,3 +642,88 @@ void InitTxPackets() {
 	HPacket.id = 0;
 	CPacket.id = 101;
 }
+
+float dVHohmann(float ap) { // calculates dV to circularize at apsis
+	float dV, r, sgp;
+	r = r_SOIBody(VData.SOINumber);
+	sgp = sgp_SOIBody(VData.SOINumber);
+	if ((r - ap) > 0) 	dV = sqrt(sgp / (ap + r)) - sqrt(sgp*(2 / (ap + r) - 1 / VData.SemiMajorAxis));
+	else dV = -1;
+	return dV;
+}
+
+float r_SOIBody(byte SOI) {
+	float r;
+	switch (SOI)
+	{
+	case 100: //kerbol
+		r = 600000;
+		break;
+	case 110: // moho
+		r = 200000;
+		break;
+	case 120: // eve
+		r = 700000;
+		break;
+	case 121: // gilly
+		r = 13000;
+		break;
+	case 130: // kerbin
+		r = 600000;
+		break;
+	case 131: // mun
+		r = 200000;
+		break;
+	case 132: // minmus
+		r = 60000;
+		break;
+	case 140: // duna
+		r = 320000;
+		break;
+	case 141: // ike
+		r = 130000;
+		break;
+
+
+	}
+	return r;
+}
+
+float sgp_SOIBody(byte SOI) {
+	float sgp;
+	switch (SOI)
+	{
+	case 100: //kerbol
+		sgp = 3531600000000;
+		break;
+	case 110: // moho
+		sgp = 65138398000;
+		break;
+	case 120: // eve
+		sgp = 8171730200000;
+		break;
+	case 121: // gilly
+		sgp = 8289449.8;
+		break;
+	case 130: // kerbin
+		sgp = 3531600000000;
+		break;
+	case 131: // mun
+		sgp = 65138398000;
+		break;
+	case 132: // minmus
+		sgp = 1765800000;
+		break;
+	case 140: // duna
+		sgp = 301363210000;
+		break;
+	case 141: // ike
+		sgp = 18568369000;
+		break;
+
+
+	}
+	return sgp;
+}
+
+int signf(float x) { return (x > 0) - (x < 0); } //returns 1, 0, -1

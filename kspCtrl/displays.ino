@@ -19,7 +19,7 @@ void Indicators()
 	}
 	else LCD1Rocket();
 	
-	
+	warnings();
 
 }
 
@@ -243,7 +243,6 @@ void LCD1Vehicle(float slope)
 
 }
 
-
 void gauges()
 {
 	int alt, speed, mono, charge;
@@ -318,4 +317,48 @@ void gauges()
 	else monop = 1.3*mono + 0.5;
 
 	analogWrite(MONO, monop);
+}
+
+void warnings()
+{
+	byte mnopct, fuelpct, elecpct, overheat, highv, lowA;
+	int elecOld, elecNew;
+
+	elecOld = elecNew;
+	elecNew = (int)VData.ECharge;
+
+	if (VData.MonoPropTot != 0)
+	{
+		mnopct = 100-round(VData.MonoProp / VData.MonoPropTot * 100);
+		warnLedSet(33, warnLvl(mnopct, 90, 95, 100));
+	}
+
+	if (VData.XenonGasTot != 0) {
+		fuelpct = 100-round(VData.XenonGas / VData.XenonGasTot * 100);
+	}
+	else {
+		fuelpct = 100-round(VData.LiquidFuelS / VData.LiquidFuelTotS * 100);
+	}
+	warnLedSet(34, warnLvl(fuelpct, 85, 95, 100));
+	
+	elecpct = 100-round(VData.ECharge / VData.EChargeTot * 100);
+	warnLedSet(33, warnLvl(elecpct, 85, 90, 95));
+
+	overheat = VData.MaxOverHeat;
+	warnLedSet(28, warnLvl(overheat, 85, 90, 95));
+
+	// check for high velocity
+	highv = reqAccPct(4);
+	if (highv > 100)  highv = 100;
+	
+	warnLedSet(22, warnLvl(highv, 80, 90, 95));
+
+	if ((dataIn[3] & B0000111) == B100) 
+	{ //aircraft
+		if (VData.RAlt < 1000) 
+		{
+			lowA =100 - (byte)(0.1 * VData.RAlt);
+			warnLedSet(21, warnLvl(lowA, 70, 90, 95));
+		}
+	}
 }
