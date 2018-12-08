@@ -31,7 +31,7 @@ int input() {
       deadtimeOld = now;
       Connected = false;
       readTime();
-	  printTime();
+	  printTime(hour, minute, second);
 	  blackout();
     }    
   }

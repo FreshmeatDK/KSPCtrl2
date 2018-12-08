@@ -280,9 +280,9 @@ void testMiscDisplay()
 	//lcd2.clear();
 	//lcd2.print(VData.TAp);
 	lcd2.setCursor(0, 0);
-	lcd2.print(select);
+	//lcd2.print(select);
 	lcd2.setCursor(0, 1);
-	lcd2.print(dataIn[3], BIN);
+	//lcd2.print(dataIn[3], BIN);
 	
 }
 

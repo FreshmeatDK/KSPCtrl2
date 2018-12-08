@@ -152,11 +152,11 @@ byte warnLvl(byte qty, byte t1, byte t2, byte t3)
 {
 	byte wlevel =0;
 	// compares the quantity qty against warning thresholds t1 -t3 and returns alarm level
-	// goes from low to high, remember to invert resource warnings
+	// goes from high to low, remember to invert high level warnings
 
-	if ((qty >= t1) && (qty < t2)) wlevel = 1;
-	else if ((qty >= t2) && (qty < t3)) wlevel = 2;
-	else if (qty > t3) wlevel = 3;
+	if (qty <= t1) wlevel = 1;
+	if (qty <= t2) wlevel = 2;
+	if (qty <= t3) wlevel = 3;
 
 	return wlevel;
 }
@@ -174,7 +174,7 @@ void warnLedSet(uint8_t lednum, uint8_t level)
 
 	if (level == 1) 
 	{
-		leds[lednum] = 0x080800; //yellow
+		leds[lednum] = 0x100800; //yellow
 	}
 
 	else if (level == 2)
@@ -185,7 +185,7 @@ void warnLedSet(uint8_t lednum, uint8_t level)
 	else if (level == 3)
 	{
 		if (second%2 == 0) leds[lednum] = 0x110000; //red blink
-		else leds[lednum] = 0x001100;
+		else leds[lednum] = 0x030000;
 	}
 	
 	else if (level == 4) //safe, no two bit value gets this level. Use for parachute
@@ -208,7 +208,7 @@ byte reqAccPct(float a) {   //returns the required percentage of acceleration
 
 	}
 	else if ((getNavballMode() == 2) && ((dataIn[3] & B0000111)== B100) && (VData.VVI < 0) && (VData.RAlt < 3000)) { // rocket in surface mode going down
-		aReqPct = (uint16_t)50 * VData.VVI*VData.VVI / (VData.RAlt * 3 * a);
+		aReqPct = (uint16_t)50 * VData.VVI*VData.VVI / (VData.RAlt * a);
 		if (aReqPct > 255) aReqPct = 255;
 	}
 

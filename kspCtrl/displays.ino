@@ -3,7 +3,7 @@ void Indicators()
 	int select;
 	float slope;
 
-	printTime();
+	printTime(hour, minute, second);
 	
 	testMiscDisplay();
 	gauges();
@@ -23,12 +23,14 @@ void Indicators()
 
 }
 
-void printTime()
+void printTime(byte h, byte m, byte s)
 {
 	readTime();
-	if (hour > 21)
+	byte ones;
+
+	if (h > 21)
 	{
-		if (((second % 4) == 0) || ((second % 4) == 1))
+		if (((s % 4) == 0) || ((s % 4) == 1))
 		{
 			lc.setChar(0, 7, 'b', false);
 		}
@@ -37,41 +39,41 @@ void printTime()
 			lc.setChar(0, 7, ' ', false);
 		}
 	}
-	if (hour > 9)
+	if (h > 9)
 	{
-		int ones = hour % 10;
-		hour = hour / 10;
-		lc.setDigit(0, 5, hour, false);
+		ones = h % 10;
+		h = h / 10;
+		lc.setDigit(0, 5, h, false);
 		lc.setDigit(0, 4, ones, true);
 	}
 	else
 	{
 		lc.setDigit(0, 5, 0, false);
-		lc.setDigit(0, 4, hour, true);
+		lc.setDigit(0, 4, h, true);
 	}
-	if (minute > 9)
+	if (m > 9)
 	{
-		int ones = minute % 10;
-		minute = minute / 10;
-		lc.setDigit(0, 3, minute, false);
+		ones = m % 10;
+		m = m / 10;
+		lc.setDigit(0, 3, m, false);
 		lc.setDigit(0, 2, ones, true);
 	}
 	else
 	{
 		lc.setDigit(0, 3, 0, false);
-		lc.setDigit(0, 2, minute, true);
+		lc.setDigit(0, 2, m, true);
 	}
-	if (second > 9)
+	if (s > 9)
 	{
-		int ones = second % 10;
-		second = second / 10;
-		lc.setDigit(0, 1, second, false);
+		ones = s % 10;
+		s = s / 10;
+		lc.setDigit(0, 1, s, false);
 		lc.setDigit(0, 0, ones, false);
 	}
 	else
 	{
 		lc.setDigit(0, 1, 0, false);
-		lc.setDigit(0, 0, second, false);
+		lc.setDigit(0, 0, s, false);
 	}
 }
 
@@ -322,6 +324,7 @@ void gauges()
 void warnings()
 {
 	byte mnopct, fuelpct, elecpct, overheat, highv, lowA;
+	byte xepct, lipct, oxpct;
 	int elecOld, elecNew;
 
 	elecOld = elecNew;
@@ -329,36 +332,37 @@ void warnings()
 
 	if (VData.MonoPropTot != 0)
 	{
-		mnopct = 100-round(VData.MonoProp / VData.MonoPropTot * 100);
-		warnLedSet(33, warnLvl(mnopct, 90, 95, 100));
+		mnopct = round(VData.MonoProp / VData.MonoPropTot * 100);
+		warnLedSet(33, warnLvl(mnopct, 20, 5, 1));
 	}
 
-	if (VData.XenonGasTot != 0) {
-		fuelpct = 100-round(VData.XenonGas / VData.XenonGasTot * 100);
-	}
-	else {
-		fuelpct = 100-round(VData.LiquidFuelS / VData.LiquidFuelTotS * 100);
-	}
-	warnLedSet(34, warnLvl(fuelpct, 85, 95, 100));
+	xepct = round(VData.XenonGas / VData.XenonGasTot * 100);
+	lipct = round(VData.LiquidFuel / VData.LiquidFuelTot * 100);
+
+	fuelpct = max(lipct, xepct);
+
+	warnLedSet(34, warnLvl(fuelpct, 15, 5, 1));
 	
-	elecpct = 100-round(VData.ECharge / VData.EChargeTot * 100);
-	warnLedSet(33, warnLvl(elecpct, 85, 90, 95));
+	elecpct = round(VData.ECharge / VData.EChargeTot * 100);
+	warnLedSet(32, warnLvl(elecpct, 25, 10, 5));
 
-	overheat = VData.MaxOverHeat;
-	warnLedSet(28, warnLvl(overheat, 85, 90, 95));
+	overheat = 100-VData.MaxOverHeat;
+	warnLedSet(28, warnLvl(overheat, 15, 10, 5));
 
 	// check for high velocity
-	highv = reqAccPct(4);
+	highv = reqAccPct(20);
 	if (highv > 100)  highv = 100;
 	
-	warnLedSet(22, warnLvl(highv, 80, 90, 95));
+	warnLedSet(22, warnLvl(highv, 20, 10, 5));
 
-	if ((dataIn[3] & B0000111) == B100) 
+	if ((dataIn[0] & B0000111) == B11) 
 	{ //aircraft
 		if (VData.RAlt < 1000) 
 		{
-			lowA =100 - (byte)(0.1 * VData.RAlt);
-			warnLedSet(21, warnLvl(lowA, 70, 90, 95));
+			lowA =(byte)(0.1 * VData.RAlt);
+			warnLedSet(21, warnLvl(lowA, 30, 10, 5));
 		}
 	}
+	else warnLedSet(21, 0);
+
 }
