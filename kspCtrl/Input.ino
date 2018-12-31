@@ -33,6 +33,7 @@ int input() {
       readTime();
 	  printTime(hour, minute, second);
 	  blackout();
+	  Serial1.print(second);
     }    
   }
 

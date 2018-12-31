@@ -20,7 +20,8 @@ void controls() {
 	chkKeypad();
 
     KSPBoardSendData(details(CPacket));
-	SendToSlave(slaveCtrl);
+	//SendToSlave(slaveCtrl);
+	sendTokRPC();
   }
 }
 

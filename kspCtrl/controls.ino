@@ -120,19 +120,111 @@ void toggles()
 	SPI.endTransaction();
 }
 
+void chkKeypad() {
+
+	char *s; // result of search
+	char key = keymain.getKey();
+
+	if (key != NO_KEY) 
+	{
+		//Serial.println(key);
+		if ((key == '#')) {
+			cmdStr[cmdStrIndex - 1] = '\0';
+			cmdStrIndex--;
+			lcd2.setCursor(cmdStrIndex, 3);
+			lcd2.print(" ");
+
+		}
+		
+		s = strchr("0123456789*", key); // Internal control panel codes
+		if (s != NULL) 
+		{
+			cmdStr[cmdStrIndex] = key;
+			cmdStrIndex++;
+			
+		}
+		s = strchr(",.-", key); //send to computer as keystrokes
+		if (s != NULL)
+		{
+			Keyboard.print(key);
+		
+		}
+
+		if (key == 'M') // phys warp increase
+		{
+			Keyboard.press(130);
+			Keyboard.press('.');
+			delay(1);
+			Keyboard.release('.');
+			Keyboard.release(130);
+		}
+
+		if (key == 'S') // phys warp decrease
+		{
+			Keyboard.press(130);
+			Keyboard.press(',');
+			delay(1);
+			Keyboard.release(',');
+			Keyboard.release(130);
+		}
+				
+
+		if (key == 'P') // reaction wheels on
+		{
+			rwheels = true;
+		}
+
+		if (key == 'R') // reaction wheels off
+		{
+			rwheels = false;
+		}
+
+		if (key == 'c') // navball: surface
+		{
+			setNavballMode(NAVBallSURFACE);
+		}
+
+		if (key == 'v') // navball: orbit
+		{
+			setNavballMode(NAVBallORBIT);
+		}
+
+		if (key == 'V') // navball: target
+		{
+			setNavballMode(NAVBallTARGET);
+		}
+				
+		if (cmdStrIndex > 18) cmdStrIndex = 18;
+	}
+	lcd2.setCursor(0, 3);
+	lcd2.print(cmdStr);
+	if ((cmdStr[cmdStrIndex - 1] == '*') && (cmdStr[cmdStrIndex - 2] == '*')) {
+		execCmd();
+		lcd2.clear();
+		for (int i = 0; i <= 18; i++) {
+			cmdStr[i] = '\0';
+		}
+		cmdStrIndex = 0;
+	}
+
+}
+
 void CtlUpdate()
 {
 	byte sasMap[10] = { 9,3,5,7,9,6,4,2,1,10 };
 	byte sasVal;
 	bool statusRead;
 	
-	//pack slaveCtrl to send to kRPC
+	//pack slaveCtrl array to send to kRPC
 
-	slaveCtrl = (dataIn[0] & B11110000); //This holds camera nibble
+	slaveCtrl[0] = (dataIn[0] & B11100000); //This holds camera nibble
 	sasVal = (dataIn[3] & B00001110); //we borrow this byte for placeholder to make things easier to follow
-	slaveCtrl = (slaveCtrl | sasVal); //sasval adds holds  solar, cargo and radiator
+	slaveCtrl[0] = (slaveCtrl[0] | sasVal); //sasval adds holds  solar, cargo and radiator
 	sasVal = (dataIn[3] & B00100000);
-	slaveCtrl = (slaveCtrl | (sasVal >> 5)); // add engine mode to last bit
+	slaveCtrl[0] = (slaveCtrl[0] | (sasVal >> 5)); // add engine mode to last bit
+	slaveCtrl[0] = (slaveCtrl[0] | (rwheels << 4));
+
+	slaveCtrl[1] = (dataIn[3] & B00000001);
 
 	//set control toggles that does not have LED attached
 	sasVal = 15 - (dataIn[1] & B00001111);
@@ -150,7 +242,7 @@ void CtlUpdate()
 			SASgrace = millis();
 		}
 	}
-	
+		
 	MainControls(STAGE, (dataIn[4] & B00000100));
 	MainControls(ABORT, (dataIn[0] & B00010000));
 
@@ -255,94 +347,5 @@ void CtlUpdate()
 
 	FastLED.show();
 
-
-}
-
-void chkKeypad() {
-
-	char *s; // result of search
-	char key = keymain.getKey();
-
-	if (key != NO_KEY) 
-	{
-		//Serial.println(key);
-		if ((key == '#')) {
-			cmdStr[cmdStrIndex - 1] = '\0';
-			cmdStrIndex--;
-			lcd2.setCursor(cmdStrIndex, 3);
-			lcd2.print(" ");
-
-		}
-		
-		s = strchr("0123456789*", key); // Internal control panel codes
-		if (s != NULL) 
-		{
-			cmdStr[cmdStrIndex] = key;
-			cmdStrIndex++;
-			
-		}
-		s = strchr(",.-", key); //send to computer as keystrokes
-		if (s != NULL)
-		{
-			Keyboard.print(key);
-		
-		}
-
-		if (key == 'M') // phys warp increase
-		{
-			Keyboard.press(130);
-			Keyboard.press('.');
-			delay(1);
-			Keyboard.release('.');
-			Keyboard.release(130);
-		}
-
-		if (key == 'S') // phys warp decrease
-		{
-			Keyboard.press(130);
-			Keyboard.press(',');
-			delay(1);
-			Keyboard.release(',');
-			Keyboard.release(130);
-		}
-				
-
-		if (key == 'P') // reaction wheels on
-		{
-			slaveCtrl = (slaveCtrl | B00010000);
-		}
-
-		if (key == 'R') // reaction wheels off
-		{
-			slaveCtrl = (slaveCtrl & B11101111);
-		}
-
-		if (key == 'c') // navball: surface
-		{
-			setNavballMode(NAVBallSURFACE);
-		}
-
-		if (key == 'v') // navball: orbit
-		{
-			setNavballMode(NAVBallORBIT);
-		}
-
-		if (key == 'V') // navball: target
-		{
-			setNavballMode(NAVBallTARGET);
-		}
-				
-		if (cmdStrIndex > 18) cmdStrIndex = 18;
-	}
-	lcd2.setCursor(0, 3);
-	lcd2.print(cmdStr);
-	if ((cmdStr[cmdStrIndex - 1] == '*') && (cmdStr[cmdStrIndex - 2] == '*')) {
-		execCmd();
-		lcd2.clear();
-		for (int i = 0; i <= 18; i++) {
-			cmdStr[i] = '\0';
-		}
-		cmdStrIndex = 0;
-	}
 
 }

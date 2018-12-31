@@ -58,6 +58,10 @@
 #define NUMIC1 4
 #define NUMIC2 1
 
+// number of bytes to communicate with kRPC
+
+#define NUMSLAVEBYTES 2
+
 //Input enums
 #define SAS 7
 #define RCS 6
@@ -228,7 +232,12 @@ int trimY, trimP, trimR, trimE;
 long timeout = 0; //timeout counter
 bool connected, displayoff; // are we connected and are we in blackout
 bool snia; //sas not in agreement
+bool rwheels = true; //turn reaction wheels on or off.
 
+byte slaveCtrl[NUMSLAVEBYTES]; //byte to send to slave Arduino to forward to kRPC
+
+
+// keypad
 char keys[5][8] = {
 	{ '7', '8', '9', '-', '.', ',', 'S', 'M' },
 { '4', '5', '6', 'c', 'v', 'V', 'P', 'R' },
@@ -239,7 +248,7 @@ char keys[5][8] = {
 byte rowPins[5] = { 35, 33, 31, 29, 37 };
 byte colPins[8] = { 26, 24, 22, 30, 28, 32, 34, 36 };
 
-byte slaveCtrl; //byte to send to slave Arduino to forward to kRPC
+
 
 // objects
 CRGB leds[NUMLEDS], oldLeds[NUMLEDS]; // Array of WS2811
@@ -254,6 +263,7 @@ Keypad keymain(makeKeymap(keys), rowPins, colPins, 5, 8);
 void setup()
 {
 	Serial.begin(38400);
+	Serial1.begin(9600);
 	Wire.begin();
 	Keyboard.begin();
 

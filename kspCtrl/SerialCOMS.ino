@@ -82,6 +82,25 @@ void KSPBoardSendData(uint8_t * address, uint8_t len){
   Serial.write(CS);
 }
 
+
+// ----- Send packet to kRPC -----
+
+void sendTokRPC()
+{
+	byte escChar = B00001111;
+	Serial1.write(B10101010);
+	for (int i = 0; i < NUMSLAVEBYTES; i++)
+	{
+		if ((slaveCtrl[i] == B11001100) || (slaveCtrl[i] == B00001111) || (slaveCtrl[i] == B10101010))
+		{
+			Serial1.write((byte*)&escChar, sizeof(escChar));
+		}
+		Serial1.write((byte*)&slaveCtrl[i], sizeof(slaveCtrl[i]));
+	}
+	Serial1.write(B11001100);
+}
+
+//----obsolete----
 void SendToSlave(byte ctrlByte)
 {
 	Wire.beginTransmission(8);
