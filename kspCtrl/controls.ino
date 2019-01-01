@@ -193,6 +193,11 @@ void chkKeypad() {
 		{
 			setNavballMode(NAVBallTARGET);
 		}
+
+		if (key == 'O')
+		{
+			parachute = true;
+		}
 				
 		if (cmdStrIndex > 18) cmdStrIndex = 18;
 	}
@@ -218,14 +223,15 @@ void CtlUpdate()
 	//pack slaveCtrl array to send to kRPC
 
 	slaveCtrl[0] = (dataIn[0] & B11100000); //This holds camera nibble
-	sasVal = (dataIn[3] & B00001110); //we borrow this byte for placeholder to make things easier to follow
-	slaveCtrl[0] = (slaveCtrl[0] | sasVal); //sasval adds holds  solar, cargo and radiator
+	sasVal = (dataIn[3] & B00001111); //we borrow this byte for placeholder to make things easier to follow
+	slaveCtrl[0] = (slaveCtrl[0] | sasVal); //sasval adds holds  solar, radiator, cargo and reserve battery
 	sasVal = (dataIn[3] & B00100000);
-	slaveCtrl[0] = (slaveCtrl[0] | (sasVal >> 5)); // add engine mode to last bit
 	slaveCtrl[0] = (slaveCtrl[0] | (rwheels << 4));
+	slaveCtrl[1] = 0;
+	slaveCtrl[1] = (slaveCtrl[1] | (sasVal >> 5)); // add engine mode to last bit
 
-	slaveCtrl[1] = (dataIn[3] & B00000001);
 
+	
 	//set control toggles that does not have LED attached
 	sasVal = 15 - (dataIn[1] & B00001111);
 	if ((getSASMode() != sasMap[sasVal]) && (millis()-SASgrace > 200 ))
@@ -341,7 +347,7 @@ void CtlUpdate()
 	statusLED(8, statusRead);
 
 	//Reserve batteries
-	statusRead = (dataIn[3] & B00000001);
+	statusRead = !(dataIn[3] & B00000001); // flipped a connection in hardware :-/
 	statusLED(9, statusRead);
 
 

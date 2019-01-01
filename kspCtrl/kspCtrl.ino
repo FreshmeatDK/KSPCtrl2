@@ -233,6 +233,7 @@ long timeout = 0; //timeout counter
 bool connected, displayoff; // are we connected and are we in blackout
 bool snia; //sas not in agreement
 bool rwheels = true; //turn reaction wheels on or off.
+bool parachute = false; //deploy parachhutes
 
 byte slaveCtrl[NUMSLAVEBYTES]; //byte to send to slave Arduino to forward to kRPC
 
