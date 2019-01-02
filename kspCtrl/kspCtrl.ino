@@ -264,7 +264,7 @@ Keypad keymain(makeKeymap(keys), rowPins, colPins, 5, 8);
 void setup()
 {
 	Serial.begin(38400);
-	Serial1.begin(9600);
+	Serial1.begin(38400);
 	Wire.begin();
 	Keyboard.begin();
 
