@@ -60,7 +60,6 @@ int nPotSl(int pot, int min, int max, int dead, int low, int high)
 
 void blackout()
 {
-	displayoff = true;
 	lcd.noBacklight();
 	lcd2.noBacklight();
 	lcd.clear();
@@ -79,9 +78,8 @@ void blackout()
 	FastLED.show();
 }
 
-void reLight()
+bool reLight()
 {
-	displayoff = false;
 	lcd.backlight();
 	lcd2.backlight();
 	for (int i = 0; i < NUMLEDS; i++)
@@ -214,21 +212,22 @@ byte reqAccPct(float a) {   //returns the required percentage of acceleration
 
 }
 
-void execCmd() {
+void execCmd(char cmdStrL[], byte cmdStrIndexL) 
+{
 	char action[2];
 	char value[18];
 	char tmpval[8];
 	int actionN;
 
-	if (cmdStr[2] == '*') {                      //if the string is of format xx*, int action = xx
+	if (cmdStrL[2] == '*') {                      //if the string is of format xx*, int action = xx
 		for (int i = 0; i < 2; i++) {
-			action[i] = cmdStr[i];
+			action[i] = cmdStrL[i];
 		}
 		action[2] = '\0';
-		for (int i = 3; i < cmdStrIndex; i++) {   // int value is the value of rest of string
-			value[i - 3] = cmdStr[i];
+		for (int i = 3; i < cmdStrIndexL; i++) {   // int value is the value of rest of string
+			value[i - 3] = cmdStrL[i];
 		}
-		value[cmdStrIndex - 3] = '\0';
+		value[cmdStrIndexL - 3] = '\0';
 
 		actionN = atoi(action);
 		switch (actionN) {

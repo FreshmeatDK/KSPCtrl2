@@ -219,21 +219,19 @@ HandShakePacket HPacket;
 VesselData VData;
 ControlPacket CPacket;
 
-unsigned long deadtime, deadtimeOld, controlTime, controlTimeOld, indicatorTime, indicatorTimeOld, mainTime, mainTimeOld;
-unsigned long now, nowIndic, nowMain;
-uint32_t SASgrace; //time until we check that SAS is not in agreement and enforce, needed to avoid ping-pong.
+unsigned long deadtime, deadtimeOld, controlTime, controlTimeOld;
+unsigned long now;
 
 byte second = 0, minute, hour = 0, dayOfWeek, dayOfMonth, month, year; // bytes to hold RT clock
-char key; // keypress buffer
-char cmdStr[19]; // command string to pass
-byte cmdStrIndex = 0; //current lenght of cmdStr
+
 int trimY, trimP, trimR, trimE;
 
 long timeout = 0; //timeout counter
-bool connected, displayoff; // are we connected and are we in blackout
-bool snia; //sas not in agreement
+
 bool rwheels = true; //turn reaction wheels on or off.
 bool parachute = false; //deploy parachhutes
+bool repscience = false; //deploy repeatable science instruments
+bool allscience = false; //deploy all science, including repeatable
 
 byte slaveCtrl[NUMSLAVEBYTES]; //byte to send to slave Arduino to forward to kRPC
 

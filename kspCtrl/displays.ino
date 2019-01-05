@@ -3,9 +3,9 @@ void Indicators()
 	int select;
 	float slope;
 
-	printTime(hour, minute, second);
+	LEDprintTime(hour, minute, second);
 	
-	testMiscDisplay();
+	//testMiscDisplay();
 	gauges();
 
 	select = (dataIn[0] & B00000111);
@@ -17,13 +17,16 @@ void Indicators()
 		slope = acos(cos(VData.Pitch*0.01744)*cos(VData.Roll*0.01744))*57.3;
 		LCD1Vehicle(slope);
 	}
-	else LCD1Rocket();
-	
+	else 
+	{
+		LCD1Rocket();
+		rocketAwareDisplayChoice();
+	}
 	warnings();
 
 }
 
-void printTime(byte h, byte m, byte s)
+void LEDprintTime(byte h, byte m, byte s)
 {
 	readTime();
 	byte ones;
@@ -149,7 +152,6 @@ void LCD1Rocket()
 	}
 
 
-
 	lcd.setCursor(0, 0);
 	lcd.print(lcd1out);	
 
@@ -206,6 +208,83 @@ void LCD1Aircraft()
 
 	lcd.setCursor(0, 0);
 	lcd.print(lcd1out);
+
+}
+
+void rocketAwareDisplayChoice() {
+	if (getNavballMode() == 3) { // if navballmode = target
+		targetApproach();
+	}
+	if (getNavballMode() == 1)
+	{
+		transferDV();
+	}
+}
+
+void transferDV() {
+	float circPE=0, circAP=0;
+	static byte graceHohmann;
+
+	if (graceHohmann != second)
+	{
+		circAP = dVHohmann(VData.AP);
+		circAP = dVHohmann(VData.PE);
+		graceHohmann = second;
+	}
+
+	lcd2.setCursor(0, 0);
+	if (VData.e < 1) {
+		lcd2.print("Circ at AP: ");
+		lcd2.print(circAP, 0);
+		lcd2.setCursor(0, 1);
+		lcd2.print("Circ at PE: ");
+		lcd2.print(-circPE, 0);
+
+	}
+	else {
+		lcd2.print("               ");
+		lcd2.setCursor(0, 1);
+		lcd2.print("               ");
+	}
+}
+
+void targetApproach() {
+	//Dispays distance, velocity and time to target
+	char lcdout2[21]; //char buffer for half display
+	char pstr[8]; // temp buffer for f2str
+
+	long tgTime; // approximate time to target
+	float tgV;
+
+	tgV = abs(VData.TargetV);
+	tgTime = (long)(VData.TargetDist / tgV);
+
+	charcpypos("Target:   D: ", 13, lcdout2, 0);
+	f2str(VData.TargetDist, 4, pstr);
+	charcpypos(pstr, 6, lcdout2, 13);
+	charcpypos("m", 1, lcdout2, 19);
+	lcdout2[20] = '\0';
+
+	lcd2.setCursor(0, 0);
+	lcd2.print(lcdout2);
+
+	charcpypos("t: ", 3, lcdout2,0);
+	time2str(tgTime, pstr);
+	charcpypos(pstr, 6, lcdout2, 3);
+	charcpypos(" V:", 3, lcdout2, 9);
+	if (VData.TargetV < 0) {
+		lcdout2[12] = '-';
+	}
+	else {
+		lcdout2[12] = ' ';
+	}
+	f2str(tgV, 4, pstr);
+	charcpypos(pstr, 6, lcdout2, 13);
+	lcdout2[19] = '%';
+	lcdout2[20] = '\0';
+
+	lcd2.setCursor(0, 1);
+	lcd2.print(lcdout2);
 
 }
 

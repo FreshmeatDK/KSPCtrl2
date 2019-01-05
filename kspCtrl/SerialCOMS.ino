@@ -100,14 +100,21 @@ void sendTokRPC()
 	Serial1.write(B11001100);
 }
 
-//----obsolete----
-void SendToSlave(byte ctrlByte)
+void CommskRPC()
 {
-	Wire.beginTransmission(8);
-	Wire.write(ctrlByte);
-	Wire.endTransmission();
+	byte flush;
+	byte clearToGo = 0;
+	
+	if (Serial1.available())
+	{
+		clearToGo = Serial1.read();
+	}
+	if (clearToGo != B10101010)
+	{
+		sendTokRPC();
+	}
+		
 }
-
 
 
 

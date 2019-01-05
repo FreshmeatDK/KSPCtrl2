@@ -1,41 +1,7 @@
-void joysticks()
-{
-	int j1x, j1y, j1z, j2x, j2y, j2z, thr;
-	
-	trimmers(); // update trimmers
 
-	j1x = nPotJy(analogRead(JOY1X), 3, 503, 550, 1023, -1000, 1000);
-	CPacket.Yaw = constrain(j1x + trimY, -1000, 1000);
 
-	j1y = nPotJy(analogRead(JOY1Y), 3, 510, 540, 1023, -1000, 1000);
-	CPacket.Pitch = constrain(j1y + trimP, -1000, 1000);
-
-	j1z = nPotJy(analogRead(JOY1Z), 3, 500, 550, 1023, -1000, 1000);
-
-	if ((dataIn[0] & B00000111) == 3)
-	{
-		CPacket.Roll = CPacket.Yaw;
-		CPacket.Yaw = constrain(j1z + trimR, -1000, 1000);
-	}
-	else
-	{
-		CPacket.Roll = constrain(j1z + trimR, -1000, 1000);
-	}
-	
-	j2x = nPotJy(analogRead(JOY2X), 3, 525, 535, 1023, -1000, 1000);
-	CPacket.TX = constrain((j2x * trimE)/100, -1000, 1000);
-
-	j2y = nPotJy(analogRead(JOY2Y), 3, 525, 535, 1023, -1000, 1000);
-	CPacket.TY = constrain((j2y * trimE) / 100, -1000, 1000);
-
-	j2z = (digitalRead(JOY2FWD) - digitalRead(JOY2BCK));
-	CPacket.TZ = constrain((j2z*trimE)*10, -1000, 1000);
-
-	thr = nPotSl(analogRead(THROTTLE), 1023, 3, 5, 0, 1000);
-	CPacket.Throttle = constrain((thr*trimE) / 100, 0, 1000);
-}
-
-void trimmers()
+void trimmers() 
+//analogue inputs
 {
 	int trYaw = 0, trPitch = 0, trRoll = 0, trEng = 0;
 
@@ -120,10 +86,52 @@ void toggles()
 	SPI.endTransaction();
 }
 
+void joysticks()
+{
+	int j1x, j1y, j1z, j2x, j2y, j2z, thr;
+
+	trimmers(); // update trimmers
+
+	j1x = nPotJy(analogRead(JOY1X), 3, 503, 550, 1023, -1000, 1000);
+	CPacket.Yaw = constrain(j1x + trimY, -1000, 1000);
+
+	j1y = nPotJy(analogRead(JOY1Y), 3, 510, 540, 1023, -1000, 1000);
+	CPacket.Pitch = constrain(j1y + trimP, -1000, 1000);
+
+	j1z = nPotJy(analogRead(JOY1Z), 3, 500, 550, 1023, -1000, 1000);
+
+	if ((dataIn[0] & B00000111) == 3)
+	{
+		CPacket.Roll = CPacket.Yaw;
+		CPacket.Yaw = constrain(j1z + trimR, -1000, 1000);
+	}
+	else
+	{
+		CPacket.Roll = constrain(j1z + trimR, -1000, 1000);
+	}
+
+	j2x = nPotJy(analogRead(JOY2X), 3, 525, 535, 1023, -1000, 1000);
+	CPacket.TX = constrain((j2x * trimE) / 100, -1000, 1000);
+
+	j2y = nPotJy(analogRead(JOY2Y), 3, 525, 535, 1023, -1000, 1000);
+	CPacket.TY = constrain((j2y * trimE) / 100, -1000, 1000);
+
+	j2z = (digitalRead(JOY2FWD) - digitalRead(JOY2BCK));
+	CPacket.TZ = constrain((j2z*trimE) * 10, -1000, 1000);
+
+	thr = nPotSl(analogRead(THROTTLE), 1023, 3, 15, 0, 1000);
+	CPacket.Throttle = constrain((thr*trimE) / 100, 0, 1000);
+}
+
 void chkKeypad() {
+
+	static uint32_t SciGrace = 0; //time until we can redeploy unrepeatable science
+	static char cmdStr[19]; // command string to pass
 
 	char *s; // result of search
 	char key = keymain.getKey();
+
+	static byte cmdStrIndex = 0; //current lenght of cmdStr
 
 	if (key != NO_KEY) 
 	{
@@ -194,9 +202,23 @@ void chkKeypad() {
 			setNavballMode(NAVBallTARGET);
 		}
 
-		if (key == 'O')
+		if (key == 'O')// engage parachute
 		{
 			parachute = true;
+		}
+
+		if (key == 'A') // repeatable scinece
+		{
+			repscience = true;
+		}
+
+		if (key == 'G') // all science
+		{
+			if ((millis() - SciGrace) > 1000)
+			{
+				SciGrace = millis();
+				allscience = true;
+			}
 		}
 				
 		if (cmdStrIndex > 18) cmdStrIndex = 18;
@@ -204,7 +226,7 @@ void chkKeypad() {
 	lcd2.setCursor(0, 3);
 	lcd2.print(cmdStr);
 	if ((cmdStr[cmdStrIndex - 1] == '*') && (cmdStr[cmdStrIndex - 2] == '*')) {
-		execCmd();
+		execCmd(cmdStr, cmdStrIndex);
 		lcd2.clear();
 		for (int i = 0; i <= 18; i++) {
 			cmdStr[i] = '\0';
@@ -216,6 +238,9 @@ void chkKeypad() {
 
 void CtlUpdate()
 {
+	static bool snia; //sas not in agreement
+	static uint32_t SASgrace = 0; //time until we check that SAS is not in agreement and enforce, needed to avoid ping-pong.
+
 	byte sasMap[10] = { 9,3,5,7,9,6,4,2,1,10 };
 	byte sasVal;
 	bool statusRead;
@@ -229,7 +254,9 @@ void CtlUpdate()
 	slaveCtrl[0] = (slaveCtrl[0] | (rwheels << 4));
 	slaveCtrl[1] = 0;
 	slaveCtrl[1] = (slaveCtrl[1] | (sasVal >> 5)); // add engine mode to last bit
-
+	slaveCtrl[1] = (slaveCtrl[1] | (parachute << 1));
+	slaveCtrl[1] = (slaveCtrl[1] | (repscience << 2));
+	slaveCtrl[1] = (slaveCtrl[1] | (allscience << 3));
 
 	
 	//set control toggles that does not have LED attached
