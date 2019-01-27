@@ -38,7 +38,13 @@ int input()
 			readTime();
 			LEDprintTime(hour, minute, second);
 			blackout();
-			Serial1.print(second);
+
+			Serial1.print(hour);
+			Serial1.print(':');
+			Serial1.print(minute);
+			Serial1.print(':');
+			Serial1.println(second);
+
     }    
   }
 

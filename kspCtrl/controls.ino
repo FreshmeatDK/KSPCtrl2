@@ -5,48 +5,61 @@ void trimmers()
 {
 	int trYaw = 0, trPitch = 0, trRoll = 0, trEng = 0;
 
-	static int trYO, trPO, trRO, trEO; //previous values of read variables
+	static int trY0, trP0, trR0, trE0; //previous values of read variables
+	static int trY1, trP1, trR1, trE1; //second previous values of read variables, to filter noise
 	static unsigned long timer; // time when display started
 	bool change;
 
-	trYaw = 50 * nPotJy(analogRead(TRIMYAW), 1004, 490, 454, 4, -20, 20);
-	trPitch = 50 * nPotJy(analogRead(TRIMPITCH), 1004, 490, 454, 4, -20, 20);
-	trRoll = 50 * nPotJy(analogRead(TRIMROLL), 1002, 545, 501, 2, -20, 20);
-	trEng = 5 * (nPotSl(analogRead(TRIMENGINE), 1002, 4, 20, 0, 20));
+	trYaw = 50 * nPotJy(analogRead(TRIMYAW), 1023, 500, 454, 4, -20, 20);
+	trPitch = 50 * nPotJy(analogRead(TRIMPITCH), 1023, 500, 454, 4, -20, 20);
+	trRoll = 50 * nPotJy(analogRead(TRIMROLL), 1023, 545, 501, 2, -20, 20);
+	trEng = 5 * (nPotSl(analogRead(TRIMENGINE), 1023, 1, 10, 0, 20));
 
-	if ((trYaw < trYO) || (trYaw > trYO))
+	if ((trimY != trY0) && (trimY != trY1))
 	{
 		trimY = trYaw;
 		LCPotDisplay(2, trimY,'y');
-		trYO = trYaw;
 		timer = millis();
 	}
 
-	if ((trPitch < trPO) || (trPitch > trPO))
+	if ((trimP != trP0) && (trimP != trP1))
 	{
 		trimP = trPitch;
 		LCPotDisplay(2, trimP,'p');
-		trPO = trPitch;
 		timer = millis();
 	}
 
-	if ((trRoll < trRO) || (trRoll > trRO))
+	if ((trimR != trR0) && (trimR != trR1))
 	{
 		trimR = trRoll;
 		LCPotDisplay(2, trimR,'r');
-		trRO = trRoll;
 		timer = millis();
 	}
 
-	if ((trEng < trEO) || (trEng > trEO))
+	if ((trimE != trE0) && (trimE != trE1))
 	{
 		trimE = trEng;
 		LCPotDisplay(2, trimE,'e');
-		trEO = trEng;
 		timer = millis();
 	}
 
+	trY1 = trY0;
+	trP1 = trP0;
+	trR1 = trR0;
+	trE1 = trE0;
 
+	trY0 = trYaw;
+	trP0 = trPitch;
+	trR0 = trRoll;
+	trE0 = trEng;
+
+	/*Serial.print(trimY);
+	Serial.print(' ');
+	Serial.print(trY0);
+	Serial.print(' ');
+	Serial.print(trY1);
+	Serial.print(' ');
+	Serial.println(analogRead(TRIMYAW));*/
 
 	if (millis() - timer > 1000)
 	{
@@ -95,7 +108,7 @@ void joysticks()
 	j1x = nPotJy(analogRead(JOY1X), 3, 503, 550, 1023, -1000, 1000);
 	CPacket.Yaw = constrain(j1x + trimY, -1000, 1000);
 
-	j1y = nPotJy(analogRead(JOY1Y), 3, 510, 540, 1023, -1000, 1000);
+	j1y = nPotJy(analogRead(JOY1Y), 1023, 510, 540, 3, -1000, 1000);
 	CPacket.Pitch = constrain(j1y + trimP, -1000, 1000);
 
 	j1z = nPotJy(analogRead(JOY1Z), 3, 500, 550, 1023, -1000, 1000);

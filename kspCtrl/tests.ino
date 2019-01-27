@@ -1,6 +1,6 @@
 void testSuite()
 {
-	chkKeypad();
+	testSPI();
 
 }
 
@@ -117,59 +117,9 @@ void testLC()
 
 void testTrim()
 {
-	int trYaw = 0, trPitch = 0, trRoll = 0, trEng = 0;
 
-	static int trYO, trPO, trRO, trEO; //previous values of read variables
-	static unsigned long timer; // time when display started
-	bool change;
+	trimmers();
 
-	trYaw = 5*nPotJy(analogRead(TRIMYAW), 1004, 490, 454, 4, -20, 20);
-	trPitch = 5 * nPotJy(analogRead(TRIMPITCH), 1004, 490, 454, 4, -20, 20);
-	trRoll = 5 * nPotJy(analogRead(TRIMROLL), 1002, 545, 501, 2, -20, 20);
-	trEng = 5*(nPotSl(analogRead(TRIMENGINE), 1002, 2, 5, 0, 20));
-
-	Serial.print(trEng);
-	Serial.print(" ");
-	Serial.println(nPotSl(trEng, 1002, 2, 5, 0, 100));
-
-	if ((trYaw < trYO) || (trYaw > trYO))
-	{
-		trimY = trYaw;
-		LCNum(2, trimY);
-		trYO = trYaw;
-		timer = millis();
-	}
-
-	if ((trPitch < trPO) || (trPitch > trPO))
-	{
-		trimP = trPitch;
-		LCNum(2, trimP);
-		trPO = trPitch;
-		timer = millis();
-	}
-
-	if ((trRoll < trRO) || (trRoll > trRO))
-	{
-		trimR = trRoll;
-		LCNum(2, trimR);
-		trRO = trRoll;
-		timer = millis();
-	}
-
-	if ((trEng < trEO) || (trEng > trEO ))
-	{
-		trimE = trEng;
-		LCNum(2, trimE);
-		trEO = trEng;
-		timer = millis();
-	}
-
-
-
-	if (millis() - timer > 1000)
-	{
-		lc.clearDisplay(2);
-	}
 
 	/*Serial.print("Yaw: ");
 	Serial.print(trYaw);

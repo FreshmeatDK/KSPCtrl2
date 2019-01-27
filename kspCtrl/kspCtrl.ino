@@ -24,11 +24,11 @@
 #define SS1 46
 #define CLKI 48
 // CD4021
-#define SS2 45
-#define CLK 27
-#define DTA 25
+#define SS2 23
+#define CLK 25
+#define DTA 27
 // FastLed
-#define LEDPIN 23
+#define LEDPIN 45
 // LedControl
 #define LCCLK 43
 #define LCCS 39
@@ -44,12 +44,12 @@
 #define TRIMPITCH 3
 #define TRIMROLL 1
 #define TRIMENGINE 0
-#define JOY1X 4
-#define JOY1Y 5 
-#define JOY1Z 6
-#define THROTTLE 7
-#define JOY2X 8
-#define JOY2Y 9 
+#define JOY1X 9
+#define JOY1Y 8 
+#define JOY1Z 10
+#define THROTTLE 4
+#define JOY2X 5
+#define JOY2Y 6 
 
 
 // number of units attached
