@@ -1,18 +1,18 @@
 // Everything back to KSP goes here
 
 void output() {
-  now = millis();
+  g_now = millis();
   
-  controlTime = now - controlTimeOld; 
-  if (controlTime > CONTROLREFRESH){
-	  controlTimeOld = now;
+  g_controlTime = g_now - g_controlTimeOld; 
+  if (g_controlTime > CONTROLREFRESH){
+	  g_controlTimeOld = g_now;
 	  controls();
   } 
  }
 
 void controls() {
       
-  if (Connected) {
+  if (g_Connected) {
 
 	joysticks();
 	toggles();

@@ -119,10 +119,9 @@
 
 
 //vars
-boolean Connected = false;
+boolean g_Connected = false;
 
-byte caution = 0, warning = 0, id;
-float acc = 1; // default acceleration, can be changed
+byte id;
 
 struct VesselData
 {
@@ -218,22 +217,21 @@ struct ControlPacket {
 HandShakePacket HPacket;
 VesselData VData;
 ControlPacket CPacket;
+byte kRPCPacket[NUMSLAVEBYTES]; //byte to send to kRPC
 
-unsigned long deadtime, deadtimeOld, controlTime, controlTimeOld;
-unsigned long now;
+unsigned long g_deadtime, g_deadtimeOld, g_controlTime, g_controlTimeOld;
+unsigned long g_now;
 
-byte second = 0, minute, hour = 0, dayOfWeek, dayOfMonth, month, year; // bytes to hold RT clock
+byte g_second = 0, g_minute, g_hour = 0, g_dayOfWeek, g_dayOfMonth, g_month, g_year; // bytes to hold RT clock
 
-int trimY, trimP, trimR, trimE;
+int g_trimY, g_trimP, g_trimR, g_trimE;
 
-long timeout = 0; //timeout counter
+bool g_rwheels = true; //turn reaction wheels on or off.
+bool g_parachute = false; //deploy parachhutes
+bool g_repscience = false; //deploy repeatable science instruments
+bool g_allscience = false; //deploy all science, including repeatable
 
-bool rwheels = true; //turn reaction wheels on or off.
-bool parachute = false; //deploy parachhutes
-bool repscience = false; //deploy repeatable science instruments
-bool allscience = false; //deploy all science, including repeatable
 
-byte slaveCtrl[NUMSLAVEBYTES]; //byte to send to slave Arduino to forward to kRPC
 
 
 // keypad

@@ -91,11 +91,11 @@ void sendTokRPC()
 	Serial1.write(B10101010);
 	for (int i = 0; i < NUMSLAVEBYTES; i++)
 	{
-		if ((slaveCtrl[i] == B11001100) || (slaveCtrl[i] == B00001111) || (slaveCtrl[i] == B10101010))
+		if ((kRPCPacket[i] == B11001100) || (kRPCPacket[i] == B00001111) || (kRPCPacket[i] == B10101010))
 		{
 			Serial1.write((byte*)&escChar, sizeof(escChar));
 		}
-		Serial1.write((byte*)&slaveCtrl[i], sizeof(slaveCtrl[i]));
+		Serial1.write((byte*)&kRPCPacket[i], sizeof(kRPCPacket[i]));
 	}
 	Serial1.write(B11001100);
 }
@@ -109,7 +109,7 @@ void CommskRPC()
 	{
 		clearToGo = Serial1.read();
 	}
-	if (clearToGo != B10101010)
+	if (clearToGo = B01010101)
 	{
 		sendTokRPC();
 	}

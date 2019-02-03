@@ -1,11 +1,11 @@
 int input() 
 {
 	int returnValue = -1;
-	now = millis();
+	g_now = millis();
 
 	  if (KSPBoardReceiveData())
 	  {
-		deadtimeOld = now;
+		g_deadtimeOld = g_now;
 		returnValue = id;
 		switch(id) 
 		{
@@ -21,29 +21,29 @@ int input()
 
 		//We got some data, set status accordingly
 
-		if (Connected == false) 
+		if (g_Connected == false) 
 		{
-			Connected = true;
+			g_Connected = true;
 			reLight();
 		}
 	
 	  }
   else
   { //if no message received for a while, go idle
-		deadtime = now - deadtimeOld; 
-		if (deadtime > IDLETIMER)
+		g_deadtime = g_now - g_deadtimeOld; 
+		if (g_deadtime > IDLETIMER)
 		{
-			deadtimeOld = now;
-			Connected = false;
+			g_deadtimeOld = g_now;
+			g_Connected = false;
 			readTime();
-			LEDprintTime(hour, minute, second);
+			LCRTC(g_hour, g_minute, g_second,0);
 			blackout();
 
-			Serial1.print(hour);
+			Serial1.print(g_hour);
 			Serial1.print(':');
-			Serial1.print(minute);
+			Serial1.print(g_minute);
 			Serial1.print(':');
-			Serial1.println(second);
+			Serial1.println(g_second);
 
     }    
   }

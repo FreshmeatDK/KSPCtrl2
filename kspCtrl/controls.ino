@@ -15,31 +15,31 @@ void trimmers()
 	trRoll = 50 * nPotJy(analogRead(TRIMROLL), 1023, 545, 501, 2, -20, 20);
 	trEng = 5 * (nPotSl(analogRead(TRIMENGINE), 1023, 1, 10, 0, 20));
 
-	if ((trimY != trY0) && (trimY != trY1))
+	if ((g_trimY != trY0) && (g_trimY != trY1))
 	{
-		trimY = trYaw;
-		LCPotDisplay(2, trimY,'y');
+		g_trimY = trYaw;
+		LCPotDisplay(2, g_trimY,'y');
 		timer = millis();
 	}
 
-	if ((trimP != trP0) && (trimP != trP1))
+	if ((g_trimP != trP0) && (g_trimP != trP1))
 	{
-		trimP = trPitch;
-		LCPotDisplay(2, trimP,'p');
+		g_trimP = trPitch;
+		LCPotDisplay(2, g_trimP,'p');
 		timer = millis();
 	}
 
-	if ((trimR != trR0) && (trimR != trR1))
+	if ((g_trimR != trR0) && (g_trimR != trR1))
 	{
-		trimR = trRoll;
-		LCPotDisplay(2, trimR,'r');
+		g_trimR = trRoll;
+		LCPotDisplay(2, g_trimR,'r');
 		timer = millis();
 	}
 
-	if ((trimE != trE0) && (trimE != trE1))
+	if ((g_trimE != trE0) && (g_trimE != trE1))
 	{
-		trimE = trEng;
-		LCPotDisplay(2, trimE,'e');
+		g_trimE = trEng;
+		LCPotDisplay(2, g_trimE,'e');
 		timer = millis();
 	}
 
@@ -53,7 +53,7 @@ void trimmers()
 	trR0 = trRoll;
 	trE0 = trEng;
 
-	/*Serial.print(trimY);
+	/*Serial.print(g_trimY);
 	Serial.print(' ');
 	Serial.print(trY0);
 	Serial.print(' ');
@@ -106,34 +106,34 @@ void joysticks()
 	trimmers(); // update trimmers
 
 	j1x = nPotJy(analogRead(JOY1X), 3, 503, 550, 1023, -1000, 1000);
-	CPacket.Yaw = constrain(j1x + trimY, -1000, 1000);
+	CPacket.Yaw = constrain(j1x + g_trimY, -1000, 1000);
 
 	j1y = nPotJy(analogRead(JOY1Y), 1023, 510, 540, 3, -1000, 1000);
-	CPacket.Pitch = constrain(j1y + trimP, -1000, 1000);
+	CPacket.Pitch = constrain(j1y + g_trimP, -1000, 1000);
 
 	j1z = nPotJy(analogRead(JOY1Z), 3, 500, 550, 1023, -1000, 1000);
 
 	if ((dataIn[0] & B00000111) == 3)
 	{
 		CPacket.Roll = CPacket.Yaw;
-		CPacket.Yaw = constrain(j1z + trimR, -1000, 1000);
+		CPacket.Yaw = constrain(j1z + g_trimR, -1000, 1000);
 	}
 	else
 	{
-		CPacket.Roll = constrain(j1z + trimR, -1000, 1000);
+		CPacket.Roll = constrain(j1z + g_trimR, -1000, 1000);
 	}
 
-	j2x = nPotJy(analogRead(JOY2X), 3, 525, 535, 1023, -1000, 1000);
-	CPacket.TX = constrain((j2x * trimE) / 100, -1000, 1000);
+	j2x = nPotJy(analogRead(JOY2X), 3, 520, 530, 1023, -1000, 1000);
+	CPacket.TX = constrain((j2x * g_trimE) / 100, -1000, 1000);
 
-	j2y = nPotJy(analogRead(JOY2Y), 3, 525, 535, 1023, -1000, 1000);
-	CPacket.TY = constrain((j2y * trimE) / 100, -1000, 1000);
+	j2y = nPotJy(analogRead(JOY2Y), 3, 490, 510, 1023, -1000, 1000);
+	CPacket.TY = constrain((j2y * g_trimE) / 100, -1000, 1000);
 
 	j2z = (digitalRead(JOY2FWD) - digitalRead(JOY2BCK));
-	CPacket.TZ = constrain((j2z*trimE) * 10, -1000, 1000);
+	CPacket.TZ = constrain((j2z*g_trimE) * 10, -1000, 1000);
 
 	thr = nPotSl(analogRead(THROTTLE), 1023, 3, 15, 0, 1000);
-	CPacket.Throttle = constrain((thr*trimE) / 100, 0, 1000);
+	CPacket.Throttle = constrain((thr*g_trimE) / 100, 0, 1000);
 }
 
 void chkKeypad() {
@@ -192,12 +192,12 @@ void chkKeypad() {
 
 		if (key == 'P') // reaction wheels on
 		{
-			rwheels = true;
+			g_rwheels = true;
 		}
 
 		if (key == 'R') // reaction wheels off
 		{
-			rwheels = false;
+			g_rwheels = false;
 		}
 
 		if (key == 'c') // navball: surface
@@ -217,12 +217,12 @@ void chkKeypad() {
 
 		if (key == 'O')// engage parachute
 		{
-			parachute = true;
+			g_parachute = true;
 		}
 
 		if (key == 'A') // repeatable scinece
 		{
-			repscience = true;
+			g_repscience = true;
 		}
 
 		if (key == 'G') // all science
@@ -230,7 +230,7 @@ void chkKeypad() {
 			if ((millis() - SciGrace) > 1000)
 			{
 				SciGrace = millis();
-				allscience = true;
+				g_allscience = true;
 			}
 		}
 				
@@ -258,18 +258,18 @@ void CtlUpdate()
 	byte sasVal;
 	bool statusRead;
 	
-	//pack slaveCtrl array to send to kRPC
+	//pack kRPCPacket array to send to kRPC
 
-	slaveCtrl[0] = (dataIn[0] & B11100000); //This holds camera nibble
+	kRPCPacket[0] = (dataIn[0] & B11100000); //This holds camera nibble
 	sasVal = (dataIn[3] & B00001111); //we borrow this byte for placeholder to make things easier to follow
-	slaveCtrl[0] = (slaveCtrl[0] | sasVal); //sasval adds holds  solar, radiator, cargo and reserve battery
+	kRPCPacket[0] = (kRPCPacket[0] | sasVal); //sasval adds holds  solar, radiator, cargo and reserve battery
 	sasVal = (dataIn[3] & B00100000);
-	slaveCtrl[0] = (slaveCtrl[0] | (rwheels << 4));
-	slaveCtrl[1] = 0;
-	slaveCtrl[1] = (slaveCtrl[1] | (sasVal >> 5)); // add engine mode to last bit
-	slaveCtrl[1] = (slaveCtrl[1] | (parachute << 1));
-	slaveCtrl[1] = (slaveCtrl[1] | (repscience << 2));
-	slaveCtrl[1] = (slaveCtrl[1] | (allscience << 3));
+	kRPCPacket[0] = (kRPCPacket[0] | (g_rwheels << 4));
+	kRPCPacket[1] = 0;
+	kRPCPacket[1] = (kRPCPacket[1] | (sasVal >> 5)); // add engine mode to last bit
+	kRPCPacket[1] = (kRPCPacket[1] | (g_parachute << 1));
+	kRPCPacket[1] = (kRPCPacket[1] | (g_repscience << 2));
+	kRPCPacket[1] = (kRPCPacket[1] | (g_allscience << 3));
 
 	
 	//set control toggles that does not have LED attached

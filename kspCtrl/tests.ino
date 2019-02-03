@@ -1,6 +1,6 @@
 void testSuite()
 {
-	testSPI();
+	testJoy();
 
 }
 
@@ -73,14 +73,14 @@ void testLCD()
 	readTime();
 	lcd2.setCursor(0, 2);
 	lcd2.print("Time: ");
-	lcd2.print(hour);
+	lcd2.print(g_hour);
 	lcd2.print(":");
-	if (minute < 10) lcd2.print("0");
-	lcd2.print(minute);
+	if (g_minute < 10) lcd2.print("0");
+	lcd2.print(g_minute);
 	lcd2.print(":");
-	if (second < 10) lcd2.print("0");
-	lcd2.print(second);
-	if ((hour > 21) && (minute > 44) || (hour > 22)) {
+	if (g_second < 10) lcd2.print("0");
+	lcd2.print(g_second);
+	if ((g_hour > 21) && (g_minute > 44) || (g_hour > 22)) {
 		lcd2.setCursor(5, 3);
 		lcd2.print("Bedtime");
 	}

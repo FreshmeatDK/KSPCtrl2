@@ -163,7 +163,7 @@ byte warnLvl(byte qty, byte t1, byte t2, byte t3)
 void warnLedSet(uint8_t lednum, uint8_t level)
 {
 	//colors led according to warnlevel
-	// use second%2 to create blink
+	// use g_second%2 to create blink
 
 	if (level == 0)
 	{
@@ -182,7 +182,7 @@ void warnLedSet(uint8_t lednum, uint8_t level)
 
 	else if (level == 3)
 	{
-		if (second%2 == 0) leds[lednum] = 0x110000; //red blink
+		if (g_second%2 == 0) leds[lednum] = 0x110000; //red blink
 		else leds[lednum] = 0x030000;
 	}
 	
@@ -237,38 +237,38 @@ void execCmd(char cmdStrL[], byte cmdStrIndexL)
 				tmpval[i] = value[i];
 			}
 			tmpval[2] = '\0';
-			year = (byte)atoi(tmpval);
+			g_year = (byte)atoi(tmpval);
 			for (int i = 0; i < 2; i++) {
 				tmpval[i] = value[i + 2];
 			}
 			tmpval[2] = '\0';
-			month = (byte)atoi(tmpval);
+			g_month = (byte)atoi(tmpval);
 			for (int i = 0; i < 2; i++) {
 				tmpval[i] = value[i + 4];
 			}
 			tmpval[2] = '\0';
-			dayOfMonth = (byte)atoi(tmpval);
+			g_dayOfMonth = (byte)atoi(tmpval);
 			for (int i = 0; i < 1; i++) {
 				tmpval[i] = value[i + 6];
 			}
 			tmpval[1] = '\0';
-			dayOfWeek = (byte)atoi(tmpval);
+			g_dayOfWeek = (byte)atoi(tmpval);
 			for (int i = 0; i < 2; i++) {
 				tmpval[i] = value[i + 7];
 			}
 			tmpval[2] = '\0';
-			hour = (byte)atoi(tmpval);
+			g_hour = (byte)atoi(tmpval);
 			for (int i = 0; i < 2; i++) {
 				tmpval[i] = value[i + 9];
 			}
 			tmpval[2] = '\0';
-			minute = (byte)atoi(tmpval);
+			g_minute = (byte)atoi(tmpval);
 			for (int i = 0; i < 2; i++) {
 				tmpval[i] = value[i + 11];
 			}
 			tmpval[2] = '\0';
-			second = (byte)atoi(tmpval);
-			setTime(second, minute, hour, dayOfWeek, dayOfMonth, month, year);
+			g_second = (byte)atoi(tmpval);
+			setTime(g_second, g_minute, g_hour, g_dayOfWeek, g_dayOfMonth, g_month, g_year);
 			break; }
 		case 92: { // clear indicators, todo clear alarms
 			lcd.clear();
@@ -282,30 +282,37 @@ void execCmd(char cmdStrL[], byte cmdStrIndexL)
 	}
 }
 
-void LCPotDisplay(int add, int16_t num, char pot)
+void LCPotDisplay(int addr, int16_t num, char pot)
 {
-	LCNum(add, num);
-	LCChar(add, pot);
+	LCNum(addr, num);
+	LCChar(addr, 7, pot);
 }
 
-void LCChar(int add, char pot)
+void LCChar(int addr, byte pos, char ch)
 {
-	switch (pot)
+	switch (ch)
 	{
 		case 'y':
-			lc.setRow(add, 7, B00111011);
+			lc.setRow(addr, pos, B00111011);
 			break;
 		case 'r':
-			lc.setRow(add, 7, B00000101);
+			lc.setRow(addr, pos, B00000101);
 			break;
 		case 'p':
-			lc.setChar(add, 7, 'P', false);
+			lc.setChar(addr, pos, 'P', false);
 			break;
 		case 'e':
-			lc.setChar(add, 7, 'E', false);
+			lc.setChar(addr, pos, 'E', false);
 			break;
+		case 'd':
+			lc.setChar(addr, pos, 'd', false);
+			break;
+		case 'h':
+			lc.setRow(addr, pos, B00010111);
+			break;
+
 		default:
-			lc.setRow(add, 7, B01001001);
+			lc.setRow(addr, pos, B01001001);
 			break;
 	}
 	
@@ -355,6 +362,97 @@ void LCNum(int add, int16_t num)
 
 }
 
+void LCKerbYDtime(uint32_t time, byte addr)
+{
+	byte y100, y10, y1;
+	byte dayDig[3];
+	uint16_t days, years;
+	bool firstDigWritten = false;
+	
+	years = time / 9203545;
+	time = time % 9203545;
+	days = time / 21600;
+	time = time % 21600;
+
+	y1 = years % 10;
+	years = years / 10;
+	y10 = years % 10;
+	y100 = years / 10;
+
+	dayDig[0] = days % 10; //ones
+	days = days / 10;
+	dayDig[1] = days % 10; //tens
+	dayDig[2] = days / 10; //hundreds
+
+	
+
+	lc.clearDisplay(addr);
+
+	if (y100 != 0)
+	{
+		lc.setDigit(addr, 7, y100, false);
+		firstDigWritten = true;
+	}
+	
+
+	if ((firstDigWritten = true) || (y10 != 0))
+	{
+		lc.setDigit(addr, 6, y10, false);
+		firstDigWritten = true;
+	}
+
+	lc.setDigit(addr, 5, y1, false);
+	
+	LCChar(addr, 4, 'y');
+	
+	for (int i = 3; i > 0; i--)
+	{
+		lc.setDigit(addr, i, dayDig[i], false);
+	}
+	LCChar(addr, 0, 'h');
+}
+
+void LCKerbDHMtime(uint32_t time, byte addr)
+{
+	uint16_t days;
+	byte hours, minutes;
+	byte dayDig[3];
+	byte minDig[2];
+	bool firstDigWritten = false;
+
+	days = time / 21600;
+	time = time % 21600;
+	hours = time / 3600;
+	time = time % 3600;
+	minutes = time / 60;
+
+	dayDig[0] = days % 10; //ones
+	days = days / 10;
+	dayDig[1] = days % 10; //tens
+	dayDig[2] = days / 10; //hundreds
+
+	minDig[0] = minutes % 10; //ones
+	minDig[1] = minutes / 10; // tens
+
+
+	if (dayDig[2] != 0)
+	{
+		lc.setDigit(addr, 7, dayDig[2], false);
+		firstDigWritten = true;
+	}
+	if ((dayDig[1] != 0) || (firstDigWritten == true))
+	{
+		lc.setDigit(addr, 6, dayDig[1], false);
+		firstDigWritten = true;
+	}
+	lc.setDigit(addr, 5, dayDig[0], false);
+	lc.setChar(addr, 4, 'd', false);
+	lc.setDigit(addr, 3, hours, false);
+	LCChar(addr, 2, 'h');
+	lc.setDigit(addr, 1, minDig[1], false);
+	lc.setDigit(addr, 0, minDig[0], false);
+}
+
 void setTime(byte ssecond, byte sminute, byte shour, byte sdayOfWeek, byte sdayOfMonth, byte smonth, byte syear)
 {
 	// sets time and date data to DS3231
@@ -377,19 +475,19 @@ void readTime()
 	Wire.endTransmission();
 	Wire.requestFrom(RTCADR, 3);
 	// request three bytes of data from DS3231 starting from register 00h
-	second = bcdToDec(Wire.read() & 0x7f);
-	minute = bcdToDec(Wire.read());
-	hour = bcdToDec(Wire.read() & 0x3f);
-	/*Serial.print(hour);
+	g_second = bcdToDec(Wire.read() & 0x7f);
+	g_minute = bcdToDec(Wire.read());
+	g_hour = bcdToDec(Wire.read() & 0x3f);
+	/*Serial.print(g_hour);
 	Serial.print(':');
-	Serial.print(minute);
+	Serial.print(g_minute);
 	Serial.print(':');
-	Serial.println(second);
+	Serial.println(g_second);
 	Serial.println();*/
-	//dayOfWeek = bcdToDec(Wire.read());
-	//dayOfMonth = bcdToDec(Wire.read());
-	//month = bcdToDec(Wire.read());
-	//year = bcdToDec(Wire.read());
+	//g_dayOfWeek = bcdToDec(Wire.read());
+	//g_dayOfMonth = bcdToDec(Wire.read());
+	//g_month = bcdToDec(Wire.read());
+	//g_year = bcdToDec(Wire.read());
 }
 
 byte decToBcd(byte val)

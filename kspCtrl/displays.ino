@@ -2,8 +2,8 @@ void Indicators()
 {
 	int select;
 	float slope;
-
-	LEDprintTime(hour, minute, second);
+	readTime();
+	LCRTC(g_hour, g_minute, g_second,0);
 	
 	//testMiscDisplay();
 	gauges();
@@ -26,57 +26,70 @@ void Indicators()
 
 }
 
-void LEDprintTime(byte h, byte m, byte s)
+void LCkerbClock(uint32_t time, byte addr) // Display time on LC addr
 {
-	readTime();
-	byte ones;
+	//tbd
 
+}
+
+void LCRTC(byte h, byte m, byte s, byte LEDAddr)
+{
 	if (h > 21)
 	{
 		if (((s % 4) == 0) || ((s % 4) == 1))
 		{
-			lc.setChar(0, 7, 'b', false);
+			lc.setChar(LEDAddr, 7, 'b', false);
 		}
 		else
 		{
-			lc.setChar(0, 7, ' ', false);
+			lc.setChar(LEDAddr, 7, ' ', false);
 		}
 	}
+
+	LChourClock(h, m, s, LEDAddr);
+}
+
+void LChourClock(byte h, byte m, byte s, byte LEDAddr)
+{
+
+	byte ones;
+
+
 	if (h > 9)
 	{
 		ones = h % 10;
 		h = h / 10;
-		lc.setDigit(0, 5, h, false);
-		lc.setDigit(0, 4, ones, true);
+		lc.setDigit(LEDAddr, 5, h, false);
+		lc.setDigit(LEDAddr, 4, ones, true);
 	}
 	else
 	{
-		lc.setDigit(0, 5, 0, false);
-		lc.setDigit(0, 4, h, true);
+		lc.setDigit(LEDAddr, 5, 0, false);
+		lc.setDigit(LEDAddr, 4, h, true);
 	}
 	if (m > 9)
 	{
 		ones = m % 10;
 		m = m / 10;
-		lc.setDigit(0, 3, m, false);
-		lc.setDigit(0, 2, ones, true);
+		lc.setDigit(LEDAddr, 3, m, false);
+		lc.setDigit(LEDAddr, 2, ones, true);
 	}
 	else
 	{
-		lc.setDigit(0, 3, 0, false);
-		lc.setDigit(0, 2, m, true);
+		lc.setDigit(LEDAddr, 3, 0, false);
+		lc.setDigit(LEDAddr, 2, m, true);
 	}
 	if (s > 9)
 	{
 		ones = s % 10;
 		s = s / 10;
-		lc.setDigit(0, 1, s, false);
-		lc.setDigit(0, 0, ones, false);
+		lc.setDigit(LEDAddr, 1, s, false);
+		lc.setDigit(LEDAddr, 0, ones, false);
 	}
 	else
 	{
-		lc.setDigit(0, 1, 0, false);
-		lc.setDigit(0, 0, s, false);
+		lc.setDigit(LEDAddr, 1, 0, false);
+		lc.setDigit(LEDAddr, 0, s, false);
 	}
 }
 
@@ -225,11 +238,11 @@ void transferDV() {
 	float circPE=0, circAP=0;
 	static byte graceHohmann;
 
-	if (graceHohmann != second)
+	if (graceHohmann != g_second)
 	{
 		circAP = dVHohmann(VData.AP);
 		circAP = dVHohmann(VData.PE);
-		graceHohmann = second;
+		graceHohmann = g_second;
 	}
 
 	lcd2.setCursor(0, 0);
