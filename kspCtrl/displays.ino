@@ -26,9 +26,11 @@ void Indicators()
 
 }
 
-void LCkerbClock(uint32_t time, byte addr) // Display time on LC addr
+void LCkerbTimeUntil(uint32_t time, byte addr) // Display time to event on LC addr
 {
-	//tbd
+	if (time >= 9203545) LCKerbYDtime(time, addr);
+	else if (time >= 21600) LCKerbDHMtime(time, addr);
+	else LCKerbHMStime(time, addr);
 
 }
 
@@ -228,10 +230,22 @@ void rocketAwareDisplayChoice() {
 	if (getNavballMode() == 3) { // if navballmode = target
 		targetApproach();
 	}
-	if (getNavballMode() == 1)
+	else
 	{
-		transferDV();
+		if (VData.MNTime > 0.1)
+		{
+			LCkerbTimeUntil(VData.MNTime, 1);
+		}
+		else
+		{
+			lc.clearDisplay(1);
+		}
+		if (getNavballMode() == 1)
+		{
+			transferDV();
+		}
 	}
+
 }
 
 void transferDV() {
@@ -271,6 +285,8 @@ void targetApproach() {
 
 	tgV = abs(VData.TargetV);
 	tgTime = (long)(VData.TargetDist / tgV);
+
+	LCkerbTimeUntil(tgTime, 1);
 
 	charcpypos("Target:   D: ", 13, lcdout2, 0);
 	f2str(VData.TargetDist, 4, pstr);

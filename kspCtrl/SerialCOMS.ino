@@ -108,10 +108,18 @@ void CommskRPC()
 	if (Serial1.available())
 	{
 		clearToGo = Serial1.read();
+		while (Serial1.available()) Serial1.read();
 	}
 	if (clearToGo = B01010101)
 	{
 		sendTokRPC();
+	}
+	if (Serial1.available() > 80)
+	{
+		lcd2.clear();
+		lcd2.print("Comms error: Overflow");
+		while (Serial1.available()) Serial1.read();
+		lcd2.clear();
 	}
 		
 }

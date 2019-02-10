@@ -310,6 +310,12 @@ void LCChar(int addr, byte pos, char ch)
 		case 'h':
 			lc.setRow(addr, pos, B00010111);
 			break;
+		case 'n':
+			lc.setRow(addr, pos, B00010101);
+			break;
+		case 's':
+			lc.setRow(addr, pos, B00011001);
+			break;
 
 		default:
 			lc.setRow(addr, pos, B01001001);
@@ -451,6 +457,35 @@ void LCKerbDHMtime(uint32_t time, byte addr)
 	LCChar(addr, 2, 'h');
 	lc.setDigit(addr, 1, minDig[1], false);
 	lc.setDigit(addr, 0, minDig[0], false);
+}
+
+void LCKerbHMStime(uint32_t time, byte addr)
+{
+	byte hours, minutes, seconds;
+	byte secDig[2];
+	byte minDig[2];
+	bool firstDigWritten = false;
+
+	hours = time / 3600;
+	time = time % 3600;
+	minutes = time / 60;
+	seconds = time % 60;
+
+	minDig[0] = minutes % 10; //ones
+	minDig[1] = minutes / 10; // tens
+
+	secDig[0] = seconds % 10;
+	secDig[1] = seconds / 10;
+
+	
+	lc.setDigit(addr, 7, hours, false);
+	LCChar(addr, 6, 'h');
+	lc.setDigit(addr, 5, minDig[1], false);
+	lc.setDigit(addr, 4, minDig[0], false);
+	LCChar(addr, 3, 'n');
+	lc.setDigit(addr, 2, secDig[1], false);
+	lc.setDigit(addr, 1, secDig[0], false);
+	LCChar(addr, 0, 's');
 }
 
 void setTime(byte ssecond, byte sminute, byte shour, byte sdayOfWeek, byte sdayOfMonth, byte smonth, byte syear)
