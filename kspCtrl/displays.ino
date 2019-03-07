@@ -255,23 +255,26 @@ void transferDV() {
 	if (graceHohmann != g_second)
 	{
 		circAP = dVHohmann(VData.AP);
-		circAP = dVHohmann(VData.PE);
+		circPE = dVHohmann(VData.PE);
 		graceHohmann = g_second;
-	}
 
-	lcd2.setCursor(0, 0);
-	if (VData.e < 1) {
-		lcd2.print("Circ at AP: ");
-		lcd2.print(circAP, 0);
-		lcd2.setCursor(0, 1);
-		lcd2.print("Circ at PE: ");
-		lcd2.print(-circPE, 0);
 
-	}
-	else {
-		lcd2.print("               ");
-		lcd2.setCursor(0, 1);
-		lcd2.print("               ");
+		lcd2.setCursor(0, 0);
+		if (VData.e < 1) {
+			lcd2.print("Circ at AP:          ");
+			lcd2.setCursor(13, 0);
+			lcd2.print(circAP, 0);
+			lcd2.setCursor(0, 1);
+			lcd2.print("Circ at PE:          ");
+			lcd2.setCursor(13, 1);
+			lcd2.print(circPE, 0);
+
+		}
+		else {
+			lcd2.print("               ");
+			lcd2.setCursor(0, 1);
+			lcd2.print("               ");
+		}
 	}
 }
 

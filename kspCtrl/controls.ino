@@ -108,7 +108,7 @@ void joysticks()
 	j1x = nPotJy(analogRead(JOY1X), 3, 503, 550, 1023, -1000, 1000);
 	CPacket.Yaw = constrain(j1x + g_trimY, -1000, 1000);
 
-	j1y = nPotJy(analogRead(JOY1Y), 1023, 510, 540, 3, -1000, 1000);
+	j1y = nPotJy(analogRead(JOY1Y), 1023, 500, 540, 3, -1000, 1000);
 	CPacket.Pitch = constrain(j1y + g_trimP, -1000, 1000);
 
 	j1z = nPotJy(analogRead(JOY1Z), 3, 500, 550, 1023, -1000, 1000);
@@ -123,7 +123,7 @@ void joysticks()
 		CPacket.Roll = constrain(j1z + g_trimR, -1000, 1000);
 	}
 
-	j2x = nPotJy(analogRead(JOY2X), 3, 520, 530, 1023, -1000, 1000);
+	j2x = nPotJy(analogRead(JOY2X), 3, 520, 540, 1023, -1000, 1000);
 	CPacket.TX = constrain((j2x * g_trimE) / 100, -1000, 1000);
 
 	j2y = nPotJy(analogRead(JOY2Y), 3, 490, 510, 1023, -1000, 1000);
@@ -132,7 +132,7 @@ void joysticks()
 	j2z = (digitalRead(JOY2FWD) - digitalRead(JOY2BCK));
 	CPacket.TZ = constrain((j2z*g_trimE) * 10, -1000, 1000);
 
-	thr = nPotSl(analogRead(THROTTLE), 1023, 3, 15, 0, 1000);
+	thr = nPotSl(analogRead(THROTTLE), 1010, 3, 15, 0, 1000);
 	CPacket.Throttle = constrain((thr*g_trimE) / 100, 0, 1000);
 }
 
