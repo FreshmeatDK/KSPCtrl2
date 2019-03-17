@@ -435,38 +435,46 @@ void gauges()
 void warnings()
 {
 	byte mnopct, fuelpct, elecpct, overheat, highv, lowA;
-	byte xepct, lipct, oxpct;
-	int elecOld, elecNew;
+	byte xepct, lipct, oxpct, sopct;
+	static int elecOld, elecNew;
 
 	elecOld = elecNew;
 	elecNew = (int)VData.ECharge;
 
-	if (VData.MonoPropTot != 0)
+	if (VData.MonoPropTot != 0)                                         //Mono
 	{
 		mnopct = round(VData.MonoProp / VData.MonoPropTot * 100);
 		warnLedSet(33, warnLvl(mnopct, 20, 5, 1));
 	}
 
-	xepct = round(VData.XenonGas / VData.XenonGasTot * 100);
-	lipct = round(VData.LiquidFuel / VData.LiquidFuelTot * 100);
+	xepct = round(VData.XenonGas / VData.XenonGasTot * 100);            //Fuel
+	lipct = round(VData.LiquidFuel / VData.LiquidFuelTot * 100);        
+	sopct = round(VData.SolidFuel / VData.SolidFuelTot * 100);
 
 	fuelpct = max(lipct, xepct);
+	fuelpct = max(fuelpct, sopct);
 
 	warnLedSet(34, warnLvl(fuelpct, 15, 5, 1));
 	
-	elecpct = round(VData.ECharge / VData.EChargeTot * 100);
+	elecpct = round(VData.ECharge / VData.EChargeTot * 100);            //EC
 	warnLedSet(32, warnLvl(elecpct, 25, 10, 5));
 
-	overheat = 100-VData.MaxOverHeat;
+	overheat = 100-VData.MaxOverHeat;                                   //Temp
 	warnLedSet(28, warnLvl(overheat, 15, 10, 5));
 
-	// check for high velocity
-	highv = reqAccPct(20);
-	if (highv > 100)  highv = 100;
+	if (VData.PE < 0) warnLedSet(26, 2);                               //impact trajectory
+	else warnLedSet(26, 0);
 	
-	warnLedSet(22, warnLvl(highv, 20, 10, 5));
+	
+	highv = reqAccPct(20);                                             // check for high velocity
+	if (highv > 100)  highv = 100;
+	if (getNavballMode() == 3) warnLedSet(30, warnLvl(highv, 20, 10, 5)); //During docking
+	else warnLedSet(30, 0);
 
-	if ((dataIn[0] & B0000111) == B11) 
+	if (getNavballMode() == 2) warnLedSet(22, warnLvl(highv, 20, 10, 5)); //during descent
+	else warnLedSet(22, 0);
+
+	if ((dataIn[0] & B0000111) == B11)                                 //Low altitude
 	{ //aircraft
 		if (VData.RAlt < 1000) 
 		{

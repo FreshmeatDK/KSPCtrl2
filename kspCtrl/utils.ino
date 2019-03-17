@@ -209,7 +209,8 @@ byte reqAccPct(float a) {   //returns the required percentage of acceleration
 		aReqPct = (uint16_t)50 * VData.VVI*VData.VVI / (VData.RAlt * a);
 		if (aReqPct > 255) aReqPct = 255;
 	}
-
+	else aReqPct = 0;
+	return aReqPct;
 }
 
 void execCmd(char cmdStrL[], byte cmdStrIndexL) 

@@ -111,7 +111,7 @@ void joysticks()
 	j1y = nPotJy(analogRead(JOY1Y), 1023, 500, 540, 3, -1000, 1000);
 	CPacket.Pitch = constrain(j1y + g_trimP, -1000, 1000);
 
-	j1z = nPotJy(analogRead(JOY1Z), 3, 500, 550, 1023, -1000, 1000);
+	j1z = nPotJy(analogRead(JOY1Z), 3, 480, 550, 1023, -1000, 1000);
 
 	if ((dataIn[0] & B00000111) == 3)
 	{

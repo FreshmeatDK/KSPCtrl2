@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kspCtrl", "kspCtrl\kspCtrl.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Keyboard", "..\..\..\..\prgm\Arduino\libraries\Keyboard\Keyboard.vcxitems", "{462439DD-E7A4-4FB4-8A5B-FFC67311BA41}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NewliquidCrystal", "..\..\..\Documents\Arduino\libraries\NewliquidCrystal\NewliquidCrystal.vcxitems", "{702574CD-06FE-4944-BEE9-707DD6B6EC98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86

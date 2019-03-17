@@ -1,4 +1,6 @@
 ﻿
+
+
 #include <Keyboard.h>
 #include <Keypad.h>
 #include <Wire.h>
@@ -6,8 +8,9 @@
 #include <SPI.h>
 #include <FastLED.h>
 #include <LedControl.h>
-#include <NewLiquidCrystal/LiquidCrystal_I2C.h>
 #include <avr/dtostrf.h>
+#include <LiquidCrystal_I2C.h>
+
 
 //I2C adresses
 #define RTCADR 0x68
@@ -214,10 +217,18 @@ struct ControlPacket {
 	int16_t WheelThrottle;                  //    0 -> 1000
 }__attribute__((packed));
 
+struct kRPCData
+{
+	uint16_t acc; //acceleration
+	uint8_t warns; //byte warnings u,u,u,u,u,u,Comms overflow, Flameout
+	uint8_t unused;
+};
+
 HandShakePacket HPacket;
 VesselData VData;
 ControlPacket CPacket;
 byte kRPCPacket[NUMSLAVEBYTES]; //byte to send to kRPC
+kRPCData kVData;
 
 unsigned long g_deadtime, g_deadtimeOld, g_controlTime, g_controlTimeOld;
 unsigned long g_now;

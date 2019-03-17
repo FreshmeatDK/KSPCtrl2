@@ -87,6 +87,7 @@ void KSPBoardSendData(uint8_t * address, uint8_t len){
 
 void sendTokRPC()
 {
+	//byte chksum = calculateLRC(kRPCPacket, NUMSLAVEBYTES);
 	byte escChar = B00001111;
 	Serial1.write(B10101010);
 	for (int i = 0; i < NUMSLAVEBYTES; i++)
@@ -98,6 +99,17 @@ void sendTokRPC()
 		Serial1.write((byte*)&kRPCPacket[i], sizeof(kRPCPacket[i]));
 	}
 	Serial1.write(B11001100);
+}
+
+byte calculateLRC(byte bytes[], byte length) //should the need arise
+{
+	byte LRC = 0;
+
+	for (int i = 0; i < length; i++)
+	{
+		LRC ^= bytes[i];
+	}
+	return LRC;
 }
 
 void CommskRPC()
@@ -124,6 +136,34 @@ void CommskRPC()
 		
 }
 
+bool receivekRPC()
+{
+	const int8_t rx_len = 4;
+	uint16_t *adress;
+	byte buff[rx_len];
+	uint8_t structSize;
+
+	structSize = sizeof(kVData);
+	adress = (uint16_t*)&kVData;
+
+	if (Serial1.available() > 6)
+	{
+		if (Serial1.read()==B01010101)
+		{
+			for (int i = 0; i < rx_len; i++)
+			{
+				buff[i] = Serial1.read();
+			}
+		}
+		if (Serial1.read() == B10101010)
+		{
+			memcpy(adress, buff, structSize);
+			return true;
+		}
+		else return false;
+	}
+
+}
 
 
 
