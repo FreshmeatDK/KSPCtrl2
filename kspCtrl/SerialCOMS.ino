@@ -142,27 +142,45 @@ bool receivekRPC()
 	uint16_t *adress;
 	byte buff[rx_len];
 	uint8_t structSize;
+	byte tmp;
 
 	structSize = sizeof(kVData);
 	adress = (uint16_t*)&kVData;
 
 	if (Serial1.available() > 6)
 	{
-		if (Serial1.read()==B01010101)
+
+		tmp = 0;
+		while (tmp != 85)
 		{
+			tmp = Serial1.read();
+
+		}
+		
+		
+
+			   		 
+		if (tmp == 85)
+		{
+
 			for (int i = 0; i < rx_len; i++)
 			{
 				buff[i] = Serial1.read();
+
 			}
-		}
-		if (Serial1.read() == B10101010)
-		{
-			memcpy(adress, buff, structSize);
-			return true;
+
+			tmp = Serial.read();
+			//if (tmp == 170)
+			{
+
+				memcpy(adress, buff, structSize);
+				return true;
+
+			}
 		}
 		else return false;
 	}
-
+	else return false;
 }
 
 

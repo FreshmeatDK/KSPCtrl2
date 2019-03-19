@@ -214,13 +214,13 @@ void testSerial()
 	float intalt	= 2;
 	
 	lcd2.clear();
-	lcd2.print(VData.AP);
-	lcd2.setCursor(10, 0);
-	lcd2.print(VData.PE);
+	lcd2.setCursor(0, 0);
+	lcd2.print(kVData.acc);
 	lcd2.setCursor(0, 1);
-	lcd2.print(VData.TAp);
+	lcd2.print(kVData.warns);
 	lcd2.setCursor(10, 1);
-	lcd2.print(VData.TPe);
+	lcd2.print(g_kconnected);
+	
 }
 
 void testMiscDisplay()

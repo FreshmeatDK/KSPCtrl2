@@ -49,7 +49,7 @@ int input()
 		}    
 	  }
 
-	  bool dummy = receivekRPC();
+	  g_kconnected = receivekRPC();
 
   return returnValue;
 }

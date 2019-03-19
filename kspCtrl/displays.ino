@@ -20,7 +20,9 @@ void Indicators()
 	else 
 	{
 		LCD1Rocket();
-		rocketAwareDisplayChoice();
+		//rocketAwareDisplayChoice();
+		lcd2.setCursor(0, 3);
+		lcd2.print(kVData.acc);
 	}
 	warnings();
 

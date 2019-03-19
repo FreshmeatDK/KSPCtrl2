@@ -123,6 +123,7 @@
 
 //vars
 boolean g_Connected = false;
+boolean g_kconnected = false;
 
 byte id;
 
