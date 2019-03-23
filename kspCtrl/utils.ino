@@ -193,20 +193,23 @@ void warnLedSet(uint8_t lednum, uint8_t level)
 
 }
 
-byte reqAccPct(float a) {   //returns the required percentage of acceleration
-							//to stop at target. 
+byte reqAccPct(int a) {   //returns the required percentage of acceleration
+							//to stop at target. a = acceleration * 100
 	uint16_t aReqPct;
-
+	float g;
 
 	if (getNavballMode() == 3) { // navball mode target
 		if (VData.TargetDist < 3000) {
-			aReqPct = (uint16_t)50 * VData.TargetV*VData.TargetV / (VData.TargetDist*a);
+			aReqPct = (uint16_t)50000*VData.TargetV*VData.TargetV / (VData.TargetDist*a); //a=v^2/2s *100 (pct)*50 (cm/s) 
 			if (aReqPct > 255) aReqPct = 255;
 		}
 
 	}
-	else if ((getNavballMode() == 2) && ((dataIn[3] & B0000111)== B100) && (VData.VVI < 0) && (VData.RAlt < 3000)) { // rocket in surface mode going down
-		aReqPct = (uint16_t)50 * VData.VVI*VData.VVI / (VData.RAlt * a);
+	else if ((getNavballMode() == 2) && ((dataIn[3] & B0000111)== B100) && (VData.VVI < 10) && (VData.RAlt < 3000)) 
+	{ // rocket in surface mode going down
+		g = g_SOIBody(kVData.SOINumber);
+		if (g != -1) aReqPct = (uint16_t)10000 * ((VData.VVI*VData.VVI / (2*VData.RAlt) - g )/a );
+		else aReqPct = 0;
 		if (aReqPct > 255) aReqPct = 255;
 	}
 	else aReqPct = 0;
@@ -778,9 +781,9 @@ void InitTxPackets() {
 
 float dVHohmann(float ap) { // calculates dV to circularize at apsis
 	float dV, r, sgp;
-	r = r_SOIBody(VData.SOINumber);
-	sgp = sgp_SOIBody(VData.SOINumber);
-	if ((r - ap) > 0) 	dV = sqrt(sgp / (ap + r)) - sqrt(sgp*(2 / (ap + r) - 1 / VData.SemiMajorAxis));
+	r = r_SOIBody(kVData.SOINumber);
+	sgp = sgp_SOIBody(kVData.SOINumber);
+	if ((r - ap) > 0 && (r != -1)) 	dV = sqrt(sgp / (ap + r)) - sqrt(sgp*(2 / (ap + r) - 1 / VData.SemiMajorAxis));
 	else dV = -1;
 	return dV;
 }
@@ -790,10 +793,10 @@ float r_SOIBody(byte SOI) {
 	switch (SOI)
 	{
 	case 100: //kerbol
-		r = 600000;
+		r = 261600000;
 		break;
 	case 110: // moho
-		r = 200000;
+		r = 250000;
 		break;
 	case 120: // eve
 		r = 700000;
@@ -816,8 +819,127 @@ float r_SOIBody(byte SOI) {
 	case 141: // ike
 		r = 130000;
 		break;
+	case 150: //"dres":
+		r = 138000;
+		break;
+	case 160: //"jool":
+		r = 6000000;
+		break;
+	case 161: //"laythe":
+		r = 500000;
+		break;
+	case 162: //"vall":
+		r = 300000;
+		break;
+	case 163: //"tylo":
+		r = 600000;
+		break;
+	case 164: //"bop":
+		r = 65000;
+		break;
+	case 165: //"pol":
+		r = 44000;
+		break;
+	case 170: //"eeloo":
+		r = 210000;
+		break;
 
+	case 200: //Ciro
+		r = 70980000;
+		break;
+	case 210: // Icarus
+		r = 160000;
+		break;
+	case 220: // Thalia
+		r = 270000;
+		break;
+	case 221: // Eta
+		r = 60000;
+		break;
+	case 230: // Niven
+		r = 400000;
+		break;
+	case 240: // Gael
+		r = 600000;
+		break;
+	case 241: // Iota
+		r = 100000;
+		break;
+	case 242: // Ceti
+		r = 150000;
+		break;
+	case 250: // Tellumo
+		r = 1000000;
+		break;
+	case 251: //"Lili":
+		r = 7000;
+		break;
+	case 260: //"Gratian":
+		r = 550000;
+		break;
+	case 261: //"Geminus":
+		r = 230000;
+		break;
+	case 270: //"Otho":
+		r = 3500000;
+		break;
+	case 271: //"Augustus":
+		r = 350000;
+		break;
+	case 272: //"Hephaestus":
+		r = 125000;
+		break;
+	case 273: //"Jannah":
+		r = 105000;
+		break;
+	case 280: //"Gauss":
+		r = 2500000;
+		break;
+	case 281: // Loki
+		r = 180000;
+		break;
+	case 282: // Catullus
+		r = 1200000;
+		break;
+	case 283: // Tarsiss
+		r = 320000;
+		break;
+	case 290: // Nero
+		r = 5000000;
+		break;
+	case 291: // Hadrian
+		r = 300000;
+		break;
+	case 292: // Narisse
+		r = 90000;
+		break;
+	case 293: //"Muse":
+		r = 130000;
+		break;
+	case 294: //"Minona":
+		r = 120000;
+		break;
+	case 295: //"Agrippina":
+		r = 50000;
+		break;
+	case 296: //"Julia":
+		r = 30000;
+		break;
+	case 310: //"Hox":
+		r = 250000;
+		break;
+	case 311: //"Argo":
+		r = 80000;
+		break;
+	case 320: //"Leto":
+		r = 210000;
+	case 400: //"Grannus":
+		r = 3017000;
+		break;
 
+	default:
+		r = -1;
+		break;
 	}
 	return r;
 }
@@ -827,10 +949,10 @@ float sgp_SOIBody(byte SOI) {
 	switch (SOI)
 	{
 	case 100: //kerbol
-		sgp = 3531600000000;
+		sgp = 1172332800000000000;
 		break;
 	case 110: // moho
-		sgp = 65138398000;
+		sgp = 168609380000;
 		break;
 	case 120: // eve
 		sgp = 8171730200000;
@@ -853,10 +975,287 @@ float sgp_SOIBody(byte SOI) {
 	case 141: // ike
 		sgp = 18568369000;
 		break;
+	case 150: //"dres":
+		sgp = 21484489000;
+		break;
+	case 160: //"jool":
+		sgp = 282528000000000;
+		break;
+	case 161: //"laythe":
+		sgp = 1962000000000;
+		break;
+	case 162: //"vall":
+		sgp = 207481500000;
+		break;
+	case 163: //"tylo":
+		sgp = 2825280000000;
+		break;
+	case 164: //"bop":
+		sgp = 2486834900;
+		break;
+	case 165: //"pol":
+		sgp = 721702080;
+		break;
+	case 170: //"eeloo":
+		sgp = 74410815000;
+		break;
+
+	case 200: //Ciro
+		sgp = 1274712872715830000;
+		break;
+	case 210: // Icarus
+		sgp = 40168038400;
+		break;
+	case 220: // Thalia
+		sgp = 214471435500;
+		break;
+	case 221: // Eta
+		sgp = 1765197000;
+		break;
+	case 230: // Niven
+		sgp = 784532000000;
+		break;
+	case 240: // Gael
+		sgp = 3530394000000;
+		break;
+	case 241: // Iota
+		sgp = 8335652500;
+		break;
+	case 242: // Ceti
+		sgp = 29787699375;
+		break;
+	case 250: // Tellumo
+		sgp = 18632635000000;
+		break;
+	case 251: //"Lili":
+		sgp = 7207888;
+		break;
+	case 260: //"Gratian":
+		sgp = 2224883718750;
+		break;
+	case 261: //"Geminus":
+		sgp = 114129792700;
+		break;
+	case 270: //"Otho":
+		sgp = 110520945500000;
+		break;
+	case 271: //"Augustus":
+		sgp = 420460118750;
+		break;
+	case 272: //"Hephaestus":
+		sgp = 12258312500;
+		break;
+	case 273: //"Jannah":
+		sgp = 7027690556;
+		break;
+	case 280: //"Gauss":
+		sgp = 63130309375000;
+		break;
+	case 281: // Loki
+		sgp = 31773546000;
+		break;
+	case 282: // Catullus
+		sgp = 12709418400000;
+		break;
+	case 283: // Tarsiss
+		sgp = 170714163200;
+		break;
+	case 290: // Nero
+		sgp = 237811262500000;
+		break;
+	case 291: // Hadrian
+		sgp = 158867730000;
+		break;
+	case 292: // Narisse
+		sgp = 3177354600;
+		break;
+	case 293: //"Muse":
+		sgp = 13258590800;
+		break;
+	case 294: //"Minona":
+		sgp = 8472945600;
+		break;
+	case 295: //"Agrippina":
+		sgp = 735498750;
+		break;
+	case 296: //"Julia":
+		sgp = 132389775;
+		break;
+	case 310: //"Hox":
+		sgp = 85808187500;
+		break;
+	case 311: //"Argo":
+		sgp = 2196689600;
+		break;
+	case 320: //"Leto":
+		sgp = 51896791800;
+	case 400: //"Grannus":
+		sgp = 6373375516920090;
+		break;
+
+	default:
+		sgp = -1;
+		break;
 
 
 	}
 	return sgp;
+}
+
+float g_SOIBody(byte SOI)
+{
+	float g;
+	switch (SOI)
+	{
+	case 100: //kerbol
+		g = 17.13;
+		break;
+	case 110: // moho
+		g = 2.7;
+		break;
+	case 120: // eve
+		g = 16.68;
+		break;
+	case 121: // gilly
+		g = 0.005;
+		break;
+	case 130: // kerbin
+		g = 9.81;
+		break;
+	case 131: // mun
+		g = 1.63;
+		break;
+	case 132: // minmus
+		g = 0.49;
+		break;
+	case 140: // duna
+		g = 2.94;
+		break;
+	case 141: // ike
+		g = 1.1;
+		break;
+	case 150: //"dres":
+		g = 1.13;
+		break;
+	case 160: //"jool":
+		g = 7.85;
+		break;
+	case 161: //"laythe":
+		g = 7.85;
+		break;
+	case 162: //"vall":
+		g = 2.31;
+		break;
+	case 163: //"tylo":
+		g = 7.85;
+		break;
+	case 164: //"bop":
+		g = 0.59;
+		break;
+	case 165: //"pol":
+		g = 0.37;
+		break;
+	case 170: //"eeloo":
+		g = 1.69;
+		break;
+
+	case 200: //Ciro
+		g = 253.01157;
+		break;
+	case 210: // Icarus
+		g = 1.569064;
+		break;
+	case 220: // Thalia
+		g = 2.941995;
+		break;
+	case 221: // Eta
+		g = 0.4903325;
+		break;
+	case 230: // Niven
+		g = 4.903325;
+		break;
+	case 240: // Gael
+		g = 9.80665;
+		break;
+	case 241: // Iota
+		g = 0.83356525;
+		break;
+	case 242: // Ceti
+		g = 1.32389775;
+		break;
+	case 250: // Tellumo
+		g = 18.632635;
+		break;
+	case 251: //"Lili":
+		g = 0.14709975;
+		break;
+	case 260: //"Gratian":
+		g = 7.3549875;
+		break;
+	case 261: //"Geminus":
+		g = 2.157463;
+		break;
+	case 270: //"Otho":
+		g = 9.022118;
+		break;
+	case 271: //"Augustus":
+		g = 3.4323275;
+		break;
+	case 272: //"Hephaestus":
+		g = 0.784532;
+		break;
+	case 273: //"Jannah":
+		g = 0.63743225;
+		break;
+	case 280: //"Gauss":
+		g = 10.1008495;
+		break;
+	case 281: // Loki
+		g = 0.980665;
+		break;
+	case 282: // Catullus
+		g = 8.825985;
+		break;
+	case 283: // Tarsiss
+		g = 1.6671305;
+		break;
+	case 290: // Nero
+		g = 9.5124505;
+		break;
+	case 291: // Hadrian
+		g = 1.765197;
+		break;
+	case 292: // Narisse
+		g = 0.392266;
+		break;
+	case 293: //"Muse":
+		g = 0.784532;
+		break;
+	case 294: //"Minona":
+		g = 0.588399;
+		break;
+	case 295: //"Agrippina":
+		g = 0.2941995;
+		break;
+	case 296: //"Julia":
+		g = 0.14709975;
+		break;
+	case 310: //"Hox":
+		g = 1.372931;
+		break;
+	case 311: //"Argo":
+		g = 0.34323275;
+		break;
+	case 320: //"Leto":
+		g = 1.176798;
+	case 400: //"Grannus":
+		g = 700.19481;
+		break;
+	default:
+		g = -1;
+		break;
+	}
+	return g;
 }
 
 int signf(float x) { return (x > 0) - (x < 0); } //returns 1, 0, -1

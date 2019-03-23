@@ -20,9 +20,8 @@ void Indicators()
 	else 
 	{
 		LCD1Rocket();
-		//rocketAwareDisplayChoice();
-		lcd2.setCursor(0, 3);
-		lcd2.print(kVData.acc);
+		rocketAwareDisplayChoice();
+
 	}
 	warnings();
 
@@ -270,6 +269,11 @@ void transferDV() {
 			lcd2.print("Circ at PE:          ");
 			lcd2.setCursor(13, 1);
 			lcd2.print(circPE, 0);
+			lcd2.setCursor(0, 2);
+			lcd2.print("SOI:          ");
+			lcd2.setCursor(5, 2);
+			circAP = r_SOIBody(kVData.SOINumber) / 1000000000;
+			lcd2.print(VData.VVI);
 
 		}
 		else {
@@ -436,9 +440,12 @@ void gauges()
 
 void warnings()
 {
-	byte mnopct, fuelpct, elecpct, overheat, highv, lowA;
+	byte mnopct, fuelpct, elecpct, overheat, highv, lowA, sigwarn;
 	byte xepct, lipct, oxpct, sopct;
 	static int elecOld, elecNew;
+	bool flameOut;
+
+	flameOut = (kVData.warns & B00000001);
 
 	elecOld = elecNew;
 	elecNew = (int)VData.ECharge;
@@ -449,12 +456,12 @@ void warnings()
 		warnLedSet(33, warnLvl(mnopct, 20, 5, 1));
 	}
 
-	xepct = round(VData.XenonGas / VData.XenonGasTot * 100);            //Fuel
-	lipct = round(VData.LiquidFuel / VData.LiquidFuelTot * 100);        
-	sopct = round(VData.SolidFuel / VData.SolidFuelTot * 100);
+	//xepct = round(VData.XenonGas / VData.XenonGasTot * 100);            //Fuel
+	fuelpct = round(VData.LiquidFuelS / VData.LiquidFuelTotS * 100);        
+	//sopct = round(VData.SolidFuel / VData.SolidFuelTot * 100);
 
-	fuelpct = max(lipct, xepct);
-	fuelpct = max(fuelpct, sopct);
+	//fuelpct = max(lipct, xepct);
+	//fuelpct = max(fuelpct, sopct);
 
 	warnLedSet(34, warnLvl(fuelpct, 15, 5, 1));
 	
@@ -468,12 +475,12 @@ void warnings()
 	else warnLedSet(26, 0);
 	
 	
-	highv = reqAccPct(20);                                             // check for high velocity
+	highv = reqAccPct(kVData.acc);                                             // check for high velocity
 	if (highv > 100)  highv = 100;
 	if (getNavballMode() == 3) warnLedSet(30, warnLvl(highv, 20, 10, 5)); //During docking
 	else warnLedSet(30, 0);
 
-	if (getNavballMode() == 2) warnLedSet(22, warnLvl(highv, 20, 10, 5)); //during descent
+	if ((getNavballMode() == 2) && (VData.VVI < -7)) warnLedSet(22, warnLvl(highv, 20, 10, 5)); //during descent
 	else warnLedSet(22, 0);
 
 	if ((dataIn[0] & B0000111) == B11)                                 //Low altitude
@@ -486,4 +493,11 @@ void warnings()
 	}
 	else warnLedSet(21, 0);
 
+	if (flameOut) warnLedSet(27, 3);									//Flameout
+	else warnLedSet(27, 0);
+
+	sigwarn = ((kVData.warns & B00001100) >> 2);
+	if (sigwarn == 0) sigwarn = 4; //green
+	
+	warnLedSet(20, sigwarn);
 }

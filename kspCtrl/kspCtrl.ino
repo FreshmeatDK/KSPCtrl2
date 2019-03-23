@@ -222,7 +222,7 @@ struct kRPCData
 {
 	uint16_t acc; //acceleration
 	uint8_t warns; //byte warnings u,u,u,u,u,u,Comms overflow, Flameout
-	uint8_t unused;
+	uint8_t SOINumber;
 };
 
 HandShakePacket HPacket;
