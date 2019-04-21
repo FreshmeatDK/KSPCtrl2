@@ -149,17 +149,12 @@ bool receivekRPC()
 
 	if (Serial1.available() > 6)
 	{
-
 		tmp = 0;
 		while (tmp != 85)
 		{
 			tmp = Serial1.read();
 
 		}
-		
-		
-
-			   		 
 		if (tmp == 85)
 		{
 
@@ -168,14 +163,11 @@ bool receivekRPC()
 				buff[i] = Serial1.read();
 
 			}
-
 			tmp = Serial.read();
 			//if (tmp == 170)
 			{
-
 				memcpy(adress, buff, structSize);
 				return true;
-
 			}
 		}
 		else return false;

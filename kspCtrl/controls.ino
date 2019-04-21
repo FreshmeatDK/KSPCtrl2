@@ -123,16 +123,16 @@ void joysticks()
 		CPacket.Roll = constrain(j1z + g_trimR, -1000, 1000);
 	}
 
-	j2x = nPotJy(analogRead(JOY2X), 3, 520, 540, 1023, -1000, 1000);
+	j2x = nPotJy(analogRead(JOY2X), 3, 500, 540, 1023, -1000, 1000);
 	CPacket.TX = constrain((j2x * g_trimE) / 100, -1000, 1000);
 
-	j2y = nPotJy(analogRead(JOY2Y), 3, 490, 510, 1023, -1000, 1000);
+	j2y = nPotJy(analogRead(JOY2Y), 3, 470, 510, 1023, -1000, 1000);
 	CPacket.TY = constrain((j2y * g_trimE) / 100, -1000, 1000);
 
 	j2z = (digitalRead(JOY2FWD) - digitalRead(JOY2BCK));
 	CPacket.TZ = constrain((j2z*g_trimE) * 10, -1000, 1000);
 
-	thr = nPotSl(analogRead(THROTTLE), 1010, 3, 15, 0, 1000);
+	thr = nPotSl(analogRead(THROTTLE), 1000, 3, 15, 0, 1000);
 	CPacket.Throttle = constrain((thr*g_trimE) / 100, 0, 1000);
 }
 
@@ -270,6 +270,8 @@ void CtlUpdate()
 	kRPCPacket[1] = (kRPCPacket[1] | (g_parachute << 1));
 	kRPCPacket[1] = (kRPCPacket[1] | (g_repscience << 2));
 	kRPCPacket[1] = (kRPCPacket[1] | (g_allscience << 3));
+	kRPCPacket[1] = (kRPCPacket[1] | (g_autoland << 4));
+	g_autoland = 0;
 
 	
 	//set control toggles that does not have LED attached

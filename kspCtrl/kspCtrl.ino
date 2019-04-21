@@ -242,7 +242,7 @@ bool g_rwheels = true; //turn reaction wheels on or off.
 bool g_parachute = false; //deploy parachhutes
 bool g_repscience = false; //deploy repeatable science instruments
 bool g_allscience = false; //deploy all science, including repeatable
-
+bool g_autoland = false; // execute autolander routine
 
 
 

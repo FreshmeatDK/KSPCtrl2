@@ -234,51 +234,58 @@ void execCmd(char cmdStrL[], byte cmdStrIndexL)
 		value[cmdStrIndexL - 3] = '\0';
 
 		actionN = atoi(action);
-		switch (actionN) {
-		case 91: // set time yy mm dd w hh mm ss
+		switch (actionN) 
 		{
-			for (int i = 0; i < 2; i++) {
-				tmpval[i] = value[i];
+			case 20:
+			{
+				g_autoland = true;
+				break;
 			}
-			tmpval[2] = '\0';
-			g_year = (byte)atoi(tmpval);
-			for (int i = 0; i < 2; i++) {
-				tmpval[i] = value[i + 2];
+
+			case 91: // set time yy mm dd w hh mm ss
+			{
+				for (int i = 0; i < 2; i++) {
+					tmpval[i] = value[i];
+				}
+				tmpval[2] = '\0';
+				g_year = (byte)atoi(tmpval);
+				for (int i = 0; i < 2; i++) {
+					tmpval[i] = value[i + 2];
+				}
+				tmpval[2] = '\0';
+				g_month = (byte)atoi(tmpval);
+				for (int i = 0; i < 2; i++) {
+					tmpval[i] = value[i + 4];
+				}
+				tmpval[2] = '\0';
+				g_dayOfMonth = (byte)atoi(tmpval);
+				for (int i = 0; i < 1; i++) {
+					tmpval[i] = value[i + 6];
+				}
+				tmpval[1] = '\0';
+				g_dayOfWeek = (byte)atoi(tmpval);
+				for (int i = 0; i < 2; i++) {
+					tmpval[i] = value[i + 7];
+				}
+				tmpval[2] = '\0';
+				g_hour = (byte)atoi(tmpval);
+				for (int i = 0; i < 2; i++) {
+					tmpval[i] = value[i + 9];
+				}
+				tmpval[2] = '\0';
+				g_minute = (byte)atoi(tmpval);
+				for (int i = 0; i < 2; i++) {
+					tmpval[i] = value[i + 11];
+				}
+				tmpval[2] = '\0';
+				g_second = (byte)atoi(tmpval);
+				setTime(g_second, g_minute, g_hour, g_dayOfWeek, g_dayOfMonth, g_month, g_year);
+				break; }
+			case 92: { // clear indicators, todo clear alarms
+				lcd.clear();
+				lcd2.clear();
+				break;
 			}
-			tmpval[2] = '\0';
-			g_month = (byte)atoi(tmpval);
-			for (int i = 0; i < 2; i++) {
-				tmpval[i] = value[i + 4];
-			}
-			tmpval[2] = '\0';
-			g_dayOfMonth = (byte)atoi(tmpval);
-			for (int i = 0; i < 1; i++) {
-				tmpval[i] = value[i + 6];
-			}
-			tmpval[1] = '\0';
-			g_dayOfWeek = (byte)atoi(tmpval);
-			for (int i = 0; i < 2; i++) {
-				tmpval[i] = value[i + 7];
-			}
-			tmpval[2] = '\0';
-			g_hour = (byte)atoi(tmpval);
-			for (int i = 0; i < 2; i++) {
-				tmpval[i] = value[i + 9];
-			}
-			tmpval[2] = '\0';
-			g_minute = (byte)atoi(tmpval);
-			for (int i = 0; i < 2; i++) {
-				tmpval[i] = value[i + 11];
-			}
-			tmpval[2] = '\0';
-			g_second = (byte)atoi(tmpval);
-			setTime(g_second, g_minute, g_hour, g_dayOfWeek, g_dayOfMonth, g_month, g_year);
-			break; }
-		case 92: { // clear indicators, todo clear alarms
-			lcd.clear();
-			lcd2.clear();
-			break;
-		}
 
 		}
 

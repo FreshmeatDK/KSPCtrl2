@@ -496,7 +496,7 @@ void warnings()
 	if (flameOut) warnLedSet(27, 3);									//Flameout
 	else warnLedSet(27, 0);
 
-	sigwarn = ((kVData.warns & B00001100) >> 2);
+	sigwarn = ((kVData.warns & B00001100) >> 2);						//Signal strength
 	if (sigwarn == 0) sigwarn = 4; //green
 	
 	warnLedSet(20, sigwarn);
