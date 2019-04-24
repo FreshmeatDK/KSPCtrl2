@@ -263,7 +263,7 @@ void CtlUpdate()
 	kRPCPacket[0] = (dataIn[0] & B11100000); //This holds camera nibble
 	sasVal = (dataIn[3] & B00001111); //we borrow this byte for placeholder to make things easier to follow
 	kRPCPacket[0] = (kRPCPacket[0] | sasVal); //sasval adds holds  solar, radiator, cargo and reserve battery
-	sasVal = (dataIn[3] & B00100000);
+	sasVal = (dataIn[3] & B00100000); // engine mode
 	kRPCPacket[0] = (kRPCPacket[0] | (g_rwheels << 4));
 	kRPCPacket[1] = 0;
 	kRPCPacket[1] = (kRPCPacket[1] | (sasVal >> 5)); // add engine mode to last bit
