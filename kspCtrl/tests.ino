@@ -1,6 +1,6 @@
 void testSuite()
 {
-	testJoy();
+	testSPI();
 	
 
 }

@@ -266,11 +266,13 @@ void CtlUpdate()
 	sasVal = (dataIn[3] & B00100000); // engine mode
 	kRPCPacket[0] = (kRPCPacket[0] | (g_rwheels << 4));
 	kRPCPacket[1] = 0;
-	kRPCPacket[1] = (kRPCPacket[1] | (sasVal >> 5)); // add engine mode to last bit
+	kRPCPacket[1] = (kRPCPacket[1] | (sasVal >> 5)); // add engine mode (stored in sasVal) to last bit
 	kRPCPacket[1] = (kRPCPacket[1] | (g_parachute << 1));
 	kRPCPacket[1] = (kRPCPacket[1] | (g_repscience << 2));
 	kRPCPacket[1] = (kRPCPacket[1] | (g_allscience << 3));
 	kRPCPacket[1] = (kRPCPacket[1] | (g_autoland << 4));
+	kRPCPacket[1] = (kRPCPacket[1] | ((dataIn[0] & B00001000) << 2)); // add abort to bit 00100000
+
 	g_autoland = 0;
 
 	
@@ -292,7 +294,7 @@ void CtlUpdate()
 	}
 		
 	MainControls(STAGE, (dataIn[4] & B00000100));
-	MainControls(ABORT, (dataIn[0] & B00010000));
+	//MainControls(ABORT, (dataIn[0] & B00010000));                    Move abort to kRPC for additional functionality
 
 	/*Picks out the relevant toggle of the dataIn bytes and change LED accordingly*/
 
