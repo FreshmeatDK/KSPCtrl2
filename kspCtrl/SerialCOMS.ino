@@ -87,9 +87,10 @@ void KSPBoardSendData(uint8_t * address, uint8_t len){
 
 void sendTokRPC()
 {
-	//byte chksum = calculateLRC(kRPCPacket, NUMSLAVEBYTES);
+	byte LRC = 0;
 	byte escChar = B00001111;
 	Serial1.write(B10101010);
+
 	for (int i = 0; i < NUMSLAVEBYTES; i++)
 	{
 		if ((kRPCPacket[i] == B11001100) || (kRPCPacket[i] == B00001111) || (kRPCPacket[i] == B10101010))
@@ -97,20 +98,14 @@ void sendTokRPC()
 			Serial1.write((byte*)&escChar, sizeof(escChar));
 		}
 		Serial1.write((byte*)&kRPCPacket[i], sizeof(kRPCPacket[i]));
+		LRC = 0; //LRC^kRPCPacket[i];
 	}
+	lcd2.println(LRC);
+	Serial1.write((byte*)&LRC, sizeof(LRC));
 	Serial1.write(B11001100);
 }
 
-byte calculateLRC(byte bytes[], byte length) //should the need arise
-{
-	byte LRC = 0;
 
-	for (int i = 0; i < length; i++)
-	{
-		LRC ^= bytes[i];
-	}
-	return LRC;
-}
 
 void CommskRPC()
 {
